@@ -6,19 +6,47 @@ from numpy.linalg import norm
 from numpy import sqrt
 from math import pi
 import matplotlib.pyplot as plt
-from packages.helper import play_trajs, rotate, sp2a, v2sp, dist, psi, beta, d_theta, d_psi
+from packages.helper import play_trajs, rotate, sp2a, v2sp, dist, psi, beta, d_theta, d_psi, hms, v2sp, play_trajs
+from packages.models import Fajen_approach, Cohen_avoid2
+from collections import defaultdict
+import time
 
 class ODESimulator:
     '''
-    This class produce simulation using ode45 method. It takes the model parameters and initial conditions
+    This class produce simulation of one trial using ode45 method. It takes the model parameters and initial conditions
     and produce the simulated time series of position, speed and acceleration based on specified models.
     Fields:
-        models (list): A list of dictionary like this: {'name': 'model_name', 'parameter1': float, 'parameter2': float, ...}
-        args (dict): Any necessary named arguments needed, such as {'w_goal': 0.1, 'w_obst': 0.2}
+        Hz (int): The frequency of the simulation.
+        var0 (list of floats): Initial conditions.
+        models (list of dicts): A list of dictionaries like this: {'name': 'model_name', 'parameter1': float, 'parameter2': float, ...}
+        args (dict): Any necessary named argument needed, such as {'w_goal': 0.1, 'w_obst': 0.2}.
+        self.t (list of float): Time stamps of simulation.
+        p_subj, p_obst, p_goal (list of lists): Time series of positions in the simulation.
+        v_subj, v_obst (list of lists): Time series of velocities in the simulation.
+        phi, dphi, s (list of floats): Time series of headings, derivative of headings and speeds.
+        sol (Bunch object, see scipy.integrate.solve_ivp): The solution of ode_func.
+        ref (2d vector): The reference vector that defines heading phi.
     '''
-    def __init__(self, models=None, args=None):
+    def __init__(self, Hz, var0=None, models=None, args=None, ref=[0, 1]):
+        self.Hz = Hz
+        self.var0 = var0
         self.models = models if models else []
         self.args = args if args else {}
+        self.t = None
+        self.p_subj = None
+        self.p_obst = None
+        self.p_goal = None
+        self.v_subj = None
+        self.v_obst = None
+        self.s = None
+        self.phi = None
+        self.dphi = None        
+        self.sol = None
+        self.ref = ref
+        
+    def set_var0(self, var0):
+        # var0 = [xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi]
+        self.var0 = var0
         
     def add_arg(self, key, value):
         ''' 
@@ -32,40 +60,63 @@ class ODESimulator:
         model (dict): {'name': 'model_name', 'parameter1': float, 'parameter2': float, ...}.
         '''
         self.models.append(model)
-        
-    def ode_func(t, var, models, args):
-        xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi = var
-        ref, w_goal, w_obst = args['ref'], args['w_goal'], args['w_obst']
-        r_g = dist([x, y], [xg, yg])
-        psi_g = psi([x, y], [xg, yg], ref=ref)
-        beta_o = beta([x, y], [xo, yo], [vx, vy])
-        d_theta_o = d_theta([x, y], [xo, yo], [vx, vy], [vxo, vyo], w_obst)
-        d_psi_o = d_psi([x, y], [xo, yo], [vx, vy], [vxo, vyo])
-        sigmoid = 1 / (1 + np.exp(20 * (np.absolute(beta_o) - 1.3)))
+    
+    def simulate(self, t_total):    
+        def ode_func(t, var, models, args):
+            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi = var
+            ref, w_goal, w_obst = self.ref, args['w_goal'], args['w_obst']
+            r_g = dist([x, y], [xg, yg])
+            psi_g = psi([x, y], [xg, yg], ref=ref)
+            beta_o = beta([x, y], [xo, yo], [vx, vy])
+            d_theta_o = d_theta([x, y], [xo, yo], [vx, vy], [vxo, vyo], w_obst)
+            d_psi_o = d_psi([x, y], [xo, yo], [vx, vy], [vxo, vyo])
+            sigmoid = 1 / (1 + np.exp(20 * (np.absolute(beta_o) - 1.3)))
 
-        def Fajen_approach(args):    
-            ps, b1, k1, c1, c2, k2 = args['ps'], args['b1'], args['k1'], args['c1'], args['c2'], args['k2']
-            ddphi = -b1 * dphi - k1 * (phi - psi_g) * (np.exp(-c1 * r_g) + c2)
-            ds = k2 * (ps - s)
-            ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
-            output = [ax, ay, ds, ddphi]
-            return output
-        
-        # Known issue: When d_psi_o is zero, it becomes a null model.
-        def Cohen_avoid2(args):
-            ps, b1, k1, c5, c6, b2, k2, c7, c8 = args['ps'], args['b1'], args['k1'], args['c5'], args['c6'], args['b2'], args['k2'], args['c7'], args['c8']
-            ddphi = -b1 * dphi - d_psi_o * k1 * np.exp(-c5 * np.absolute(d_psi_o)) * (1 - np.exp(-c6 * np.maximum(0, d_theta_o))) * sigmoid
-            ds = b2 * (ps - s) + d_psi_o * k2 * np.exp(-c7 * np.absolute(d_psi_o)) * (1 - np.exp(-c8 * np.maximum(0, d_theta_o))) * sigmoid
-            ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
-            output = [ax, ay, ds, ddphi]
-            return output
-        
-        output = np.array([0.0] * 4)
-        for model in models:
-            if model['name'] == 'Cohen_avoid2':
-                output += np.array(Cohen_avoid2(model))
-            elif model['name'] == 'Fajen_approach':
-                output += np.array(Fajen_approach(model))
-        # xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi = var
-        dvardt = [0, 0, vxo, vyo, 0, 0, vx, vy, output[0], output[1], dphi, output[2], output[3]]
-        return dvardt
+            output = defaultdict(float)
+            for model in models:
+                if model['name'] == 'Cohen_avoid2':
+                    for key, val in Cohen_avoid2(model, dphi, s, beta_o, d_theta_o, d_psi_o, sigmoid).items():
+                        output[key] += val
+                elif model['name'] == 'Fajen_approach':
+                    for key, val in Fajen_approach(model, phi, dphi, s, psi_g, r_g).items():
+                        output[key] += val
+            if 'ds' in output:
+                ds, ddphi = output['ds'], output['ddphi']
+                ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
+            elif 'dds' in ouput:
+                pass
+            elif 'a' in output:
+                pass
+            
+            # xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi = var
+            dvardt = [0, 0, vxo, vyo, 0, 0, vx, vy, ax, ay, dphi, ds, ddphi]
+            return dvardt
+        tic = time.perf_counter()
+        t_eval = np.linspace(0, t_total, t_total * self.Hz)
+        self.sol = solve_ivp(ode_func, [0, t_total], self.var0, t_eval=t_eval, args=[self.models, self.args])
+        xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi = self.sol.y
+        self.t = t_eval
+        self.p_subj = np.stack((x, y), axis=-1)
+        self.p_obst = np.stack((xo, yo), axis=-1)
+        self.p_goal = np.stack((xg, yg), axis=-1)
+        self.v_subj = np.stack((vx, vy), axis=-1)
+        self.v_obst = np.stack((vxo, vyo), axis=-1)
+        self.phi = phi
+        self.dphi = dphi
+        self.s = s
+        toc = time.perf_counter()
+        print(f'Simulation finished in {hms(tic - toc):s}')
+    
+    def play(self, colors=None, interval=None, save=False):
+        '''
+        Args:
+            interval (float): The pause between two frames in millisecond.
+            save (bool): Flag for saving the animation in the current working directory.
+        '''
+        ws = [0.4, self.args['w_goal'], self.args['w_obst']] 
+        labels = ['subj', 'goal', 'obst']
+        trajs = [self.p_subj, self.p_goal, self.p_obst]
+        play_trajs(trajs, ws, self.Hz, ref=self.ref, labels=labels, colors=colors, interval=interval, save=save)
+            
+            
+            

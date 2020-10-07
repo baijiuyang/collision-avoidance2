@@ -571,11 +571,15 @@ def collision_trajectory(beta, side, spd1=1.3, w=1.5, r=10, r_min=0, Hz=100, ani
     
 def play_trajs(trajs, ws, Hz, ref=[0,1], labels=None, colors=None, interval=None, save=False):
     '''
-    trajs (2-d np array)
-    
     Args:
-            interval (float): The pause between two frames in millisecond.
-            save (bool): Flag for saving the animation in the current working directory.
+        trajs (list of traj): Trajectories to be played. shape: n_frame by n_dimension.
+        ws (list of floats): The width of agents.
+        Hz (int): The frequency of data.
+        ref (2d vector): The reference vector that defines heading phi.
+        labels (list of str): Label of each agent.
+        colors (list of str): Color of each agent, such as ['r', 'g', 'b'].
+        interval (float): The pause between two frames in millisecond.
+        save (bool): Flag for saving the animation in the current working directory.
     '''
     trajs = np.array(trajs)
     if not interval: interval = 1000 / Hz
