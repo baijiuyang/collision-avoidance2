@@ -461,11 +461,9 @@ def min_sep(p0, p1, v0, v1):
     '''
     This function computes the projected minimum separation or distance at closest approach (dca) 
     and time to minimum separation or time to closest approach (ttca) of two trajectiles.
-    
     Args:
-        p0, p1 (tuple): Initial positions of agent 0 and agent 1 in meters.
-        v0, v1 (tuple): Velocities of agent 0 and agent 1 in meters/second.
-        
+        p0, p1 (2-d vector): Initial positions of agent 0 and agent 1 in meters.
+        v0, v1 (2-d vector): Velocities of agent 0 and agent 1 in meters/second. 
     Return:
         dca (float): Minimum separation or distance at closest approach in meters. Positive
             value means agent 0 will pass in front on agent 1, negative means the opposite.
@@ -509,7 +507,7 @@ def min_dist(traj0, traj1):
     if np.sign(inner(v1, v0T)) == beta_sign:
         min_d = -min_d
     return inx, min_d
-
+    
 def collision_trajectory(beta, side, spd1=1.3, w=1.5, r=10, r_min=0, Hz=100, animate=False, interval=None, save=False):
     '''
     This function produces near-collision trajectories of circular agents 0 and 1 with 
@@ -569,7 +567,7 @@ def collision_trajectory(beta, side, spd1=1.3, w=1.5, r=10, r_min=0, Hz=100, ani
     
     return traj0, traj1, np.tile(v0, (n, 1)), np.tile(v1, (n, 1))
     
-def play_trajs(trajs, ws, Hz, ref=[0,1], labels=None, colors=None, interval=None, save=False):
+def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, interval=None, save=False):
     '''
     Args:
         trajs (list of traj): Trajectories to be played. shape: n_frame by n_dimension.
@@ -622,7 +620,7 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], labels=None, colors=None, interval=None
     ax2.set_ylim(-12, 12)
     ax2.set_xlabel('postion x (m)')
     ax2.set_ylabel('postion y (m)')
-    ax2.set_title('Path')
+    ax2.set_title(title if title else 'Path')
     ax2.set_aspect('equal')    
     angles = np.linspace(0, 2 * math.pi, num=12)
     circles = []
