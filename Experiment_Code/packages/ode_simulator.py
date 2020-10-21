@@ -1,6 +1,6 @@
 # This module contains the defination of ODESimulator class, which was created by Joey Bai to support his dissertation studies.
 # please contact baijiuyang@hotmail.com for support. Git: https://github.com/baijiuyang/collision-avoidance.git
-from scipy.integrate import solve_ivp
+from scipy.integrate import solve_ivp, odeint
 import numpy as np
 from numpy.linalg import norm
 from numpy import sqrt, gradient
@@ -72,8 +72,39 @@ class ODESimulator:
         self.s_pred = []
         self.phi_pred = []
         self.dphi_pred = []
-    
-    def simulate(self, var0, i_trial=None, print_time=True):    
+        
+    @staticmethod
+    def odeEuler(f, t, y0, args=None):
+        '''Approximate the solution of y'=f(y,t) by Euler's method.
+
+        Parameters
+        ----------
+        f : function
+            Right-hand side of the differential equation y'=f(t,y), y(t_0)=y_0
+        y0 : number
+            Initial value y(t0)=y0 wher t0 is the entry at index 0 in the array t
+        t : array
+            1D NumPy array of t values where we approximate y values. Time step
+            at each iteration is given by t[n+1] - t[n].
+
+        Returns
+        -------
+        y : 1D NumPy array
+            Approximation y[n] of the solution y(t_n) computed by Euler's method.
+        '''
+        y = np.zeros((len(t), len(y0)))
+        y[0] = y0
+        for n in range(0,len(t)-1):
+            y[n+1] = y[n] + np.array(f(t[n], y[n], args[0], args[1])) * (t[n+1] - t[n])
+        return y
+        
+    def simulate(self, var0, total_time=None, i_trial=None, print_time=True):
+        if self.data:
+            print(self.data.info['trial_id'][i_trial], i_trial)
+        # Skip freewalk trial
+        if self.data and self.data.info['obst_speed'][i_trial] == 0:
+            print('freewalk trial')
+            return
         def ode_func(t, var, models, args):
             xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi, ds = var
             ref, w_goal, w_obst = self.ref, args['w_goal'], args['w_obst']
@@ -115,6 +146,9 @@ class ODESimulator:
                         output[key] += val
             if 'ds' in output:
                 ddphi, ds = output['ddphi'], output['ds']
+                # Avoid extreme value for ode45 solver
+                # ddphi = np.sign(ddphi) * min(abs(ddphi), 3)
+                # ds = np.sign(ds) * min(abs(ds), 3)
                 dds = 0
                 ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
             elif 'dds' in output:
@@ -127,20 +161,30 @@ class ODESimulator:
             return dvardt
         if print_time:
             tic = time.perf_counter()
-        t0, t1 = self.data.info['stimuli_onset'][i_trial], self.data.info['stimuli_out'][i_trial]
-        t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
+        if self.data:
+            t0, t1 = self.data.info['stimuli_onset'][i_trial], self.data.info['stimuli_out'][i_trial]
+            t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
+        else:
+            t_eval = np.linspace(0, total_time - 1 / self.Hz, total_time * self.Hz)
         self.i_trials.append(i_trial)
         if not self.data:
             self.var0.append(var0)
-        sol = solve_ivp(ode_func, [0, t_eval[-1]], var0, t_eval=t_eval, args=[self.models, self.args])
+        sol = solve_ivp(ode_func, [0, t_eval[-1]], var0, method='BDF', t_eval=t_eval, args=[self.models, self.args])
         xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi, ds = sol.y
+        if len(x) != len(t_eval):
+            print("simulation ended early, switch to Euler method")
+            t_eval2 = t_eval[ : len(t_eval)-len(x)]
+            var0 = [xg[-1], yg[-1], xo[-1], yo[-1], vxo[-1], vyo[-1], x[-1], y[-1], vx[-1], vy[-1], phi[-1], s[-1], dphi[-1], ds[-1]]
+            y2 = ODESimulator.odeEuler(ode_func, t_eval2, var0, args=[self.models, self.args])
+            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi, ds = np.concatenate((sol.y, np.transpose(y2)), axis=1)
         self.p_pred.append(np.stack((x, y), axis=-1))
         self.p_obst.append(np.stack((xo, yo), axis=-1))
         self.p_goal.append(np.stack((xg, yg), axis=-1))
         self.v_pred.append(np.stack((vx, vy), axis=-1))
         self.phi_pred.append(phi)
-        self.s_pred.append(s)        
-        self.p_subj.append(self.data.p_subj[i_trial][t0:t1])
+        self.s_pred.append(s)
+        if self.data:
+            self.p_subj.append(self.data.p_subj[i_trial][t0:t0 + len(x)])
         if print_time:
             toc = time.perf_counter()
             print(f'Simulation finished in {hms(toc - tic):s} t_total {t_eval[-1]:f}')

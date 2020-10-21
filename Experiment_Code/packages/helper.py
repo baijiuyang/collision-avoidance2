@@ -287,7 +287,11 @@ def beta(p0, p1, v0):
         r01 = [i - j for i, j in zip(p1, p0)]
         r = norm(r01)
         s0 = norm(v0)
+        if r == 0 or s0 == 0:
+            return 0
         angle = arccos(inner(v0, r01) / (s0 * r))
+        if math.isnan(angle):
+            return 0
         # Decide the side of agent 1 on agent 0. Rotate v0 90 degree clockwise 
         # v0' = (y, -x) if the sign of its dot product with r01 is negative, 
         # agent 1 is on the left side of agent 0, which means a negative beta. Vice versa.
@@ -586,7 +590,8 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, i
     fig = plt.figure(figsize=(15, 7))
     spec = gridspec.GridSpec(ncols=3, nrows=1,
                          width_ratios=[1, 1, 2])
-    
+    if title:
+        fig.suptitle(title)
     # Create speed plot
     ax0 = fig.add_subplot(spec[0])
     ax0.set_ylim(0, 2.0)
@@ -620,7 +625,7 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, i
     ax2.set_ylim(-12, 12)
     ax2.set_xlabel('postion x (m)')
     ax2.set_ylabel('postion y (m)')
-    ax2.set_title(title if title else 'Path')
+    ax2.set_title('Path')
     ax2.set_aspect('equal')    
     angles = np.linspace(0, 2 * math.pi, num=12)
     circles = []
