@@ -267,6 +267,21 @@ def d_theta_numeric(p0, p1, w, Hz):
     d_thatas = np.diff(thetas)
     return np.append(d_thatas, d_thatas[-1]) * Hz # Pad to the length of p0.
 
+def side(r01, v0):
+    '''
+    Computes the side that agent 1 belongs given the postion and velocity of agent 0.
+    Rotate v0 (x, y) 90 degree clockwise get v0' = (y, -x). If the sign of inner(v0', r01)
+    is positive, agent 1 is on the right side of agent 0, vice versa.
+    
+    Args:
+        r01 (2-d vector): Line of sight from agent 0 to agent 1 in meters.
+        v0 (2-d vector): Velocity of agent 0in m/s.
+        
+    Return:
+        (int): 1 right side, -1 left side, 0 perfectly in front.
+    '''
+    return np.sign(v0[1] * r01[0] - v0[0] * r01[1])
+
 def beta(p0, p1, v0):
     '''
     Compute beta angle of p1 in the perspective of p0 in radians.
@@ -281,7 +296,7 @@ def beta(p0, p1, v0):
         
     Return:
         (float or np array of floats): Beta angle in radians. [-pi, pi].
-        Positive value means p1 is on the left hand side of p0.
+        Positive value means p1 is on the right visual field of p0.
     '''
     def _beta(p0, p1, v0):
         r01 = [i - j for i, j in zip(p1, p0)]
@@ -292,13 +307,10 @@ def beta(p0, p1, v0):
         angle = arccos(inner(v0, r01) / (s0 * r))
         if math.isnan(angle):
             return 0
-        # Decide the side of agent 1 on agent 0. Rotate v0 90 degree clockwise 
-        # v0' = (y, -x) if the sign of its dot product with r01 is negative, 
-        # agent 1 is on the left side of agent 0, which means a negative beta. Vice versa.
-        if v0[1] * r01[0] - v0[0] * r01[1] < 0: 
+        if side(r01, v0) < 0: 
             angle = -angle
         return angle
-        
+
     if len(np.shape(p0)) == 1:
         return _beta(p0, p1, v0)
     else:
@@ -481,9 +493,10 @@ def min_sep(p0, p1, v0, v1):
         return norm(p01), 0
     v10 = np.array(v0) - np.array(v1)
     dca = np.sqrt(1 - (inner(p01, v10) / (norm(p01) * norm(v10))) ** 2) * norm(p01)
-    ttca = inner(p01, v10) / norm(v10) ** 2 # np.inner takes care of the sign
-    if inner(np.array(v1), np.array(p0) - np.array(p1) + v10 * ttca) < 0: # Check passing order
-        dca *= -1
+    ttca = inner(p01, v10) / norm(v10) ** 2  # np.inner takes care of the sign
+    # At the moment of min_dist, the agent who cannot see the other is guaranteed have passed first.
+    if inner(np.array(v1), np.array(p0) - np.array(p1) + v10 * ttca) < 0:  # Check passing order
+        dca = -dca
     return dca, ttca
     
 def min_dist(traj0, traj1):
@@ -504,14 +517,12 @@ def min_dist(traj0, traj1):
     min_d = dists[inx]
     p0 = traj0[inx]
     p1 = traj1[inx]
-    v0 = traj0[inx + 1] - traj0[inx]
     v1 = traj1[inx + 1] - traj1[inx]
-    v0T = [v0[1], -v0[0]]
-    beta_sign = np.sign(inner(p1 - p0, v0T))    
-    if np.sign(inner(v1, v0T)) == beta_sign:
+    # At the moment of min_dist, the agent who cannot see the other is guaranteed have passed first.
+    if np.sign(inner(v1, p0 - p1)) < 0:
         min_d = -min_d
     return inx, min_d
-    
+
 def collision_trajectory(beta, side, spd1=1.3, w=1.5, r=10, r_min=0, Hz=100, animate=False, interval=None, save=False):
     '''
     This function produces near-collision trajectories of circular agents 0 and 1 with 

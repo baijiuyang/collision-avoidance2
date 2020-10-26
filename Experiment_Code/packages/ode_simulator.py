@@ -4,9 +4,9 @@ from scipy.integrate import solve_ivp, odeint
 import numpy as np
 from numpy.linalg import norm
 from numpy import sqrt, gradient
-from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.metrics import mean_squared_error, mean_absolute_error, accuracy_score
 from packages.helper import play_trajs, sp2a, sp2v, psi, beta, d_theta, \
-                            d_psi, hms, v2sp, dist, min_sep, av2dsdp
+                            d_psi, hms, v2sp, dist, min_sep, av2dsdp, min_dist
 from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_avoid2, \
                             cohen_avoid3, cohen_avoid4, vector_approach, perpendicular_avoid
                             
@@ -32,36 +32,15 @@ class ODESimulator:
     def __init__(self, Hz=None, models=None, args=None, data=None, ref=[0, 1]):
         self.Hz = Hz
         self.var0 = []
+        self.var0_match = []  # var0 at t0_match
         self.models = models
         self.args = args
         self.data = data
-        self.ref = ref
+        self.ref = ref        
         self.reset()
         if data:
-            data.filter_all()
             self.use_data()
-            
-    def use_data(self):
-        self.Hz = self.data.Hz
-        self.var0 = []
-        self.args = {'w_goal': self.data.info['w_goal'], 'w_obst': self.data.info['w_obst']}
-        for i in range(len(self.data.trajs)):        
-            t0, t1 = self.data.info['stimuli_onset'][i], self.data.info['stimuli_out'][i]
-            t_total = (t1 - t0)
-            xg0, yg0 = self.data.info['p_goal'][i][t0]
-            p_obst = self.data.info['p_obst'][i]
-            xo0, yo0 = p_obst[t0]
-            vxo0, vyo0 = (p_obst[-1] - p_obst[t0]) / (len(p_obst) - 1 - t0) * self.Hz
-            x0, y0 = self.data.p_subj[i][t0]
-            vx0, vy0 = (self.data.p_subj[i][t0+1] - self.data.p_subj[i][t0-1]) / 2 * self.Hz
-            s0, phi0 = v2sp([vx0, vy0])
-            v_pre = (self.data.p_subj[i][t0] - self.data.p_subj[i][t0-2]) / 2 * self.Hz
-            v_post = (self.data.p_subj[i][t0+2] - self.data.p_subj[i][t0]) / 2 * self.Hz
-            a0 = (v_post - v_pre) / 2 * self.Hz
-            _, dphi0 = av2dsdp([vx0, vy0], a0)
-            ds0 = (norm(v_post) - norm(v_pre)) / 2 * self.Hz
-            self.var0.append([xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, phi0, s0, dphi0, ds0])
-            
+    
     def reset(self):
         self.i_trials = []
         self.p_pred = []
@@ -72,7 +51,44 @@ class ODESimulator:
         self.s_pred = []
         self.phi_pred = []
         self.dphi_pred = []
+        self.t0 = []
+        self.pass_order_pred = []
+    
+    def use_data(self):
+        self.Hz = self.data.Hz
+        self.var0 = []
+        self.args = {'w_goal': self.data.info['w_goal'], 'w_obst': self.data.info['w_obst']}
+        for i in range(len(self.data.trajs)):
+            # print(f'Loading trial {i}')
+            if self.data.info['obst_speed'][i]:
+                # Compute order passing
+                subj = self.data.get_traj(i)
+                obst = self.data.info['p_obst'][i]
+                # Compute var0 for simulation
+                t0, t0_match = self.data.info['stimuli_onset'][i], self.data.info['stimuli_match'][i]
+                self.var0.append(self.compute_var0(i, t0))
+                self.var0_match.append(self.compute_var0(i, t0_match))             
+            else:
+                self.var0.append(None)
+                self.var0_match.append(None)
+        print(f'Loading finished')
         
+    def compute_var0(self, i_trial, t0):
+        i = i_trial
+        xg0, yg0 = self.data.info['p_goal'][i][t0]
+        p_obst = self.data.info['p_obst'][i]
+        xo0, yo0 = p_obst[t0]
+        vxo0, vyo0 = (p_obst[-1] - p_obst[t0]) / (len(p_obst) - 1 - t0) * self.Hz
+        x0, y0 = self.data.info['p_subj'][i][t0]
+        vx0, vy0 = (self.data.info['p_subj'][i][t0+1] - self.data.info['p_subj'][i][t0-1]) / 2 * self.Hz
+        s0, phi0 = v2sp([vx0, vy0])
+        v_pre = (self.data.info['p_subj'][i][t0] - self.data.info['p_subj'][i][t0-2]) / 2 * self.Hz
+        v_post = (self.data.info['p_subj'][i][t0+2] - self.data.info['p_subj'][i][t0]) / 2 * self.Hz
+        a0 = (v_post - v_pre) / 2 * self.Hz
+        _, dphi0 = av2dsdp([vx0, vy0], a0)
+        ds0 = (norm(v_post) - norm(v_pre)) / 2 * self.Hz
+        return xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, phi0, s0, dphi0, ds0
+
     @staticmethod
     def odeEuler(f, t, y0, args=None):
         '''Approximate the solution of y'=f(y,t) by Euler's method.
@@ -97,14 +113,11 @@ class ODESimulator:
         for n in range(0,len(t)-1):
             y[n+1] = y[n] + np.array(f(t[n], y[n], args[0], args[1])) * (t[n+1] - t[n])
         return y
-        
-    def simulate(self, var0, total_time=None, i_trial=None, print_time=True):
-        if self.data:
+
+    def simulate(self, var0, t0=None, t1=None, total_time=None, i_trial=None, print_trial=False, print_time=True):
+        if print_trial and self.data:
             print(self.data.info['trial_id'][i_trial], i_trial)
-        # Skip freewalk trial
-        if self.data and self.data.info['obst_speed'][i_trial] == 0:
-            print('freewalk trial')
-            return
+        
         def ode_func(t, var, models, args):
             xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi, ds = var
             ref, w_goal, w_obst = self.ref, args['w_goal'], args['w_obst']
@@ -117,9 +130,6 @@ class ODESimulator:
             
             output = defaultdict(float)
             for model in models:
-                # Use preferred speed from data.
-                if self.data:
-                    model['ps'] = self.data.info['ps_subj'][i_trial]
                 if model['name'] == 'fajen_approach':
                     for key, val in fajen_approach(model, phi, dphi, s, psi_g, r_g).items():
                         output[key] += val
@@ -146,9 +156,6 @@ class ODESimulator:
                         output[key] += val
             if 'ds' in output:
                 ddphi, ds = output['ddphi'], output['ds']
-                # Avoid extreme value for ode45 solver
-                # ddphi = np.sign(ddphi) * min(abs(ddphi), 3)
-                # ds = np.sign(ds) * min(abs(ds), 3)
                 dds = 0
                 ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
             elif 'dds' in output:
@@ -161,14 +168,15 @@ class ODESimulator:
             return dvardt
         if print_time:
             tic = time.perf_counter()
-        if self.data:
-            t0, t1 = self.data.info['stimuli_onset'][i_trial], self.data.info['stimuli_out'][i_trial]
-            t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
-        else:
+        if total_time:
             t_eval = np.linspace(0, total_time - 1 / self.Hz, total_time * self.Hz)
-        self.i_trials.append(i_trial)
-        if not self.data:
             self.var0.append(var0)
+        else:
+            t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
+            for model in self.models:
+                # Use preferred speed from var0.
+                model['ps'] = var0[-3]
+        
         sol = solve_ivp(ode_func, [0, t_eval[-1]], var0, method='BDF', t_eval=t_eval, args=[self.models, self.args])
         xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi, ds = sol.y
         if len(x) != len(t_eval):
@@ -183,25 +191,34 @@ class ODESimulator:
         self.v_pred.append(np.stack((vx, vy), axis=-1))
         self.phi_pred.append(phi)
         self.s_pred.append(s)
+        p0, p1, v0, v1 = [x[-2], y[-2]], [xo[-2], yo[-2]], [vx[-2], vy[-2]], [vxo[-2], vyo[-2]]      
         if self.data:
-            self.p_subj.append(self.data.p_subj[i_trial][t0:t0 + len(x)])
+            self.t0.append(t0)
+            self.i_trials.append(i_trial)
+            self.p_subj.append(self.data.info['p_subj'][i_trial][t0:t0 + len(x)])
+            angle = self.data.info['obst_angle'][i_trial]
+            self.pass_order_pred.append(np.sign(-angle * beta(p0, p1, v0)))
         if print_time:
             toc = time.perf_counter()
             print(f'Simulation finished in {hms(toc - tic):s} t_total {t_eval[-1]:f}')
-            
-    def simulate_all(self, subj_id=None):
+    
+    def simulate_all(self, trials=None, match_order=False, print_trial=False):
         tic = time.perf_counter()
-        for i in range(len(self.data.trajs)):
-            # Only simulate for one subject
-            if subj_id != None and self.data.info['subj_id'][i] != subj_id:
-                continue
-            # Skip freewalk trials and trials with obst_angle == +-180
+        n_trials = 0
+        if not trials:
+            trials = range(len(self.data.trajs))
+        for i in trials:
+            # Skip freewalk trial and +-180 trials
             if self.data.info['obst_speed'][i] == 0 or abs(self.data.info['obst_angle'][i]) == 180:
                 continue
-            self.simulate(self.var0[i], i_trial=i, print_time=False)
+            var0 = self.var0_match[i] if match_order else self.var0[i]
+            t0 = self.data.info['stimuli_match'][i] if match_order else self.data.info['stimuli_onset'][i]
+            t1 = self.data.info['stimuli_out'][i]
+            self.simulate(var0, t0=t0, t1=t1, i_trial=i, print_trial=print_trial, print_time=False)
+            n_trials += 1
         toc = time.perf_counter()
-        print(f'Simulation_all finished in {hms(toc - tic):s}')
-        
+        print(f'Simulated {n_trials} trials in {hms(toc - tic):s}')
+
     def play(self, i_trial=0, actual=False, title=None, colors=None, interval=None, save=False):
         '''
         Args:
@@ -211,7 +228,7 @@ class ODESimulator:
         # Trial index in data instead of simulation results (because some trials are skipped in simulation)
         j_trial = self.i_trials[i_trial]
         w_goal, w_obst = self.args['w_goal'], self.args['w_obst']
-        ws = [0.4, w_goal, w_obst] 
+        ws = [0.4, w_goal, w_obst]
         labels = ['pred', 'goal', 'obst']
         if self.data:
             if self.data.info['obst_speed'][j_trial] == 0 or abs(self.data.info['obst_angle'][j_trial]) == 180:
@@ -222,7 +239,7 @@ class ODESimulator:
             labels.append('subj')
             p_subj = self.data.get_traj(j_trial)            
             # Pad values to p_pred to give it the same length as p_subj
-            t0 = self.data.info['stimuli_onset'][j_trial]
+            t0 = self.t0[i_trial]
             p_pred = np.zeros_like(p_subj)
             p_pred[t0: t0+len(self.p_pred[i_trial])] = self.p_pred[i_trial]            
             # p_pred[:t0], p_pred[t0+len(self.p_pred[i_trial]):] = p_pred[t0], p_pred[t0+len(self.p_pred[i_trial])-1]
@@ -272,11 +289,16 @@ class ODESimulator:
             v_subj = gradient(self.p_subj, axis=0) * Hz            
             for i in range(len(preds)):
                 trues.append(v2sp(v_subj[i], ref=self.ref)[1])
+        elif var == 'order':
+            preds = self.pass_order_pred
+            trues = np.array(self.data.info['pass_order'])[self.i_trials]
         if i_trial:
             trues = trues[i_trial]
             preds = preds[i_trial]
             
         # Compute metric
+        if alg == 'accuracy':
+            return accuracy_score(trues, preds)
         vals = []
         for i in range(len(preds)):
             if alg == 'dist':
@@ -286,5 +308,5 @@ class ODESimulator:
             elif alg == 'MSE':
                 vals.append(mean_squared_error(trues[i], preds[i]))
             elif alg == 'RMSE':
-                vals.append(np.sqrt(mean_squared_error(trues[i], preds[i])))
+                vals.append(np.sqrt(mean_squared_error(trues[i], preds[i])))  
         return np.mean(vals)    
