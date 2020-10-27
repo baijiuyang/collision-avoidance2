@@ -1,5 +1,7 @@
 # collision-avoidance2
-This repo is created to serve simulation and analysis on the data collected in Jiuyang Bai's dissertation research.
+This repo is created to serve simulation and analysis on the data collected in Jiuyang Bai's dissertation research. \
+List of models: https://www.overleaf.com/read/qnfvrfptvcxf
+
 # Required packages
 ```
 python 3.6
