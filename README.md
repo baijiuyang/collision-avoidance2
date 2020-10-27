@@ -10,3 +10,15 @@ pickle
 sklearn
 mpl_toolkits
 ```
+# Experiment
+Experiment_Code/experiment.py (requires Vizard 5+)
+# Data processing
+Experiment_Code/import_data.ipynb
+# Data structure
+Experiment/packages/data_container.py
+# Simulation
+Experiment_Code/simulation.ipynb
+# Data visualization and analysis
+Experiment_Code/anaylsis.ipynb
+# Models
+Experiment/packages/models.py
