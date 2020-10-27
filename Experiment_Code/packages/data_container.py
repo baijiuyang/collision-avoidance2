@@ -1,3 +1,7 @@
+'''
+This module contains the Data class. It is used to save raw and filtered data
+and some recorded and computed trial related information.
+'''
 from scipy.signal import butter, filtfilt
 from scipy.interpolate import interp1d
 import numpy as np

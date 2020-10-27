@@ -1,5 +1,7 @@
-# This module contains the defination of ODESimulator class, which was created by Joey Bai to support his dissertation studies.
-# please contact baijiuyang@hotmail.com for support. Git: https://github.com/baijiuyang/collision-avoidance.git
+'''
+This module contains the ODESimulator class. 
+It uses a combination of BDF (first choice) and Euler method (backup choice) to solve odes.
+'''
 from scipy.integrate import solve_ivp, odeint
 import numpy as np
 from numpy.linalg import norm

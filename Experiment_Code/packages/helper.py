@@ -1,6 +1,6 @@
-# This module contains all the helper functions for the dissertation research of Jiuyang Bai
-# on the control law of pedestrian collision avoidance, please contact baijiuyang@hotmail.com
-# for support. Github: https://github.com/baijiuyang/collision-avoidance.git
+'''
+This module contains the helper functions.
+'''
 import time
 import math
 import numpy as np

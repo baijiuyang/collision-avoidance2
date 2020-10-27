@@ -1,3 +1,6 @@
+'''
+This module contains the code for model fitting.
+'''
 import os
 import sys
 import numpy as np
@@ -73,7 +76,7 @@ def main():
     elif method == 'differential_evolution':
         res = optimize.differential_evolution(error, bounds, args=(simulator, trials, logfile))
     elif method == 'basinhopping':
-        res = optimize.basinhopping(error, bounds, args=(simulator, trials, logfile))   
+        res = optimize.basinhopping(error, bounds, minimizer_kwargs={'args':(simulator, trials, logfile)})
     with open(logfile, 'a') as file:
         file.write(f'The optimal x: {res.x:str}')
     print(res.x)

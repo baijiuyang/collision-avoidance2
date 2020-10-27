@@ -1,4 +1,9 @@
-﻿import random
+﻿'''
+This module contains the code to generate inputs for the experiments,
+which are randomized sequences of conditions.
+'''
+
+import random
 
 # trial list generator
 def create_trial_list(angles, speeds, rep, n_freewalk):

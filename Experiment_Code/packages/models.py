@@ -1,4 +1,6 @@
-# This module contains models of pedestrian locomotion.
+'''
+This module contains the the ODESimulator class.
+'''
 import numpy as np
 from math import pi
 from numpy import absolute, exp, sign, maximum, array
