@@ -56,7 +56,7 @@ class Data:
         data = np.array(self.trajs[i_traj])[:, col]
         t = self.info['time_stamp'][i_traj]
         if filtered:
-            return self.filter(data, t, self.Hz, order, cutoff)
+            return filter(data, t, self.Hz, order, cutoff)
         else:
             return np.array(self.trajs[i_traj])[:, col]
             
