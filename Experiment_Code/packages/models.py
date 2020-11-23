@@ -4,7 +4,8 @@ This module contains the the ODESimulator class.
 import numpy as np
 from math import pi
 from numpy import absolute, exp, sign, maximum, array
-
+'''{'name': 'fajen_approach', 'ps': None,
+                  'b1': 3.25, 'k1': 7.5, 'c1': 0.4, 'c2': 0.4, 'k2': 1.4}'''
 def fajen_approach(args, phi, dphi, s, psi, r):    
     ps, b1, k1, c1, c2, k2 = args['ps'], args['b1'], args['k1'], args['c1'], args['c2'], args['k2']
     ddphi = -b1 * dphi - k1 * (phi - psi) * (exp(-c1 * r) + c2)
