@@ -44,9 +44,9 @@ def error(x, simulator, trials, logfile):
     
 def main():
     method = 'dual_annealing'
-    subject = 0
+    subject = int(input('Type subject number: '))
     notes = 'Exclude free-walk trials, exclude 180 trials, \
-             start simuation when passing order is predictable, \
+             start simuation when obst beta > 90 end at the end of trial, \
              use subject preferred speed'
     logfile = 'fitting_log_' + ymdhms() + '.txt'
     bounds = [(0, 30), (0, 70), (0, 10), (0, 10), (0, 10)]
