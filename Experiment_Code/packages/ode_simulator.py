@@ -202,27 +202,26 @@ class ODESimulator:
                 for model in self.models:                        
                     # Use subject preferred speed
                     model['ps'] = self.data.info['ps_subj'][i]
-            if i not in self.var0:
-                if t_start == 'obst_onset':
-                    t0 = self.data.info['stimuli_onset'][i]
-                elif t_start == 'match_order':
-                    t0, t1 = self.data.info['stimuli_onset'][i], self.data.info['stimuli_out'][i]
-                    for ti in range(t0, t1):
-                        var0 = self.compute_var0(i, ti)
-                        dvardt = self.ode_func(0, var0, self.models, self.args)
-                        pass_order = self.data.info['pass_order'][i]
-                        pred_order = dvardt[-2] * np.sign(self.data.info['obst_angle'][i])
-                        if np.sign(pass_order) == np.sign(pred_order):
-                            t0 = ti
-                            break
-                elif t_start == 'obst_out':
-                    t0 = self.data.info['stimuli_out'][i]
-                if t_end == 'obst_out':
-                    t1 = self.data.info['stimuli_out'][i]
-                elif t_end == 'end':
-                    t1 = len(self.data.trajs[i]) - 1
-                self.t0[i], self.t1[i] = t0, t1
-                self.var0[i] = self.compute_var0(i, t0)
+            if t_start == 'obst_onset':
+                t0 = self.data.info['stimuli_onset'][i]
+            elif t_start == 'match_order':
+                t0, t1 = self.data.info['stimuli_onset'][i], self.data.info['stimuli_out'][i]
+                for ti in range(t0, t1):
+                    var0 = self.compute_var0(i, ti)
+                    dvardt = self.ode_func(0, var0, self.models, self.args)
+                    pass_order = self.data.info['pass_order'][i]
+                    pred_order = dvardt[-2] * np.sign(self.data.info['obst_angle'][i])
+                    if np.sign(pass_order) == np.sign(pred_order):
+                        t0 = ti
+                        break
+            elif t_start == 'obst_out':
+                t0 = self.data.info['stimuli_out'][i]
+            if t_end == 'obst_out':
+                t1 = self.data.info['stimuli_out'][i]
+            elif t_end == 'end':
+                t1 = len(self.data.trajs[i]) - 1
+            self.t0[i], self.t1[i] = t0, t1
+            self.var0[i] = self.compute_var0(i, t0)
             
             if ps == 'var0':
                 for model in self.models:
