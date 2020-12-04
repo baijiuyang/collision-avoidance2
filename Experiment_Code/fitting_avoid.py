@@ -74,7 +74,8 @@ def error(x, simulator, trials, logfile):
     
 def main():
     global approach
-    method = 'dual_annealing'
+    method = {1: 'dual_annealing', 2: 'differential_evolution'}
+    method = method[int(input('Choose optimizer: 1 -- dual_annealing 2 -- differential_evolution'))]
     subject = int(input('Type subject number: '))
     approach = approaches[subject]
     notes = 'Exclude free-walk trials, exclude 180 trials, \
