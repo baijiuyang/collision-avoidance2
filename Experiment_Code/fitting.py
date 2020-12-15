@@ -110,7 +110,8 @@ def build_simulator(experiment_name, subject):
 def error(x, simulator, trials, logfile, args):
     global i_iter
     i_iter += 1
-    print(f'iteration {i_iter:03d}, x = ', [f'{a:0.3f}' for a in x])
+    print(f'iter {i_iter:03d}, subj{args.subject}, {args.training_model}, '
+        f'x = ', [f'{a:0.3f}' for a in x])
     if args.training_model_type == 'approach':
         if args.approach_model == 'fajen_approach':
             simulator.models = [{'name': 'fajen_approach',
@@ -150,7 +151,7 @@ def main():
     if not args:
         args = get_input_args()
     notes = 'Excluded free-walk trials, excluded 180 trials'
-    logfile = 'fitting_log_' + ymdhms() + '.txt'
+    logfile = 'fitting_log_' + str(args.subject) + '_' + ymdhms() + '.txt'
     bounds = model_bounds[args.training_model]
     simulator, trials = build_simulator(args.experiment_name, args.subject)
     with open(logfile, 'a') as file:
