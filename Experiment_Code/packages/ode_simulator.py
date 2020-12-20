@@ -2,6 +2,8 @@
 This module contains the ODESimulator class. 
 It uses a combination of BDF (first choice) and Euler method (backup choice) to solve odes.
 '''
+from collections import defaultdict
+import time
 from scipy.integrate import solve_ivp, odeint
 import numpy as np
 from numpy.linalg import norm
@@ -11,9 +13,7 @@ from packages.helper import play_trajs, sp2a, sp2v, psi, beta, d_theta, \
                             d_psi, hms, v2sp, dist, min_sep, av2dsdp, min_dist
 from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_avoid2, \
                             cohen_avoid3, cohen_avoid4, vector_approach, perpendicular_avoid
-                            
-from collections import defaultdict
-import time
+
 
 class ODESimulator:
     '''
@@ -180,8 +180,9 @@ class ODESimulator:
         if self.data:
             self.i_trials.append(i_trial)
             self.p_subj.append(self.data.info['p_subj'][i_trial][t0:t0 + len(x)])
-            angle = self.data.info['obst_angle'][i_trial]
-            self.pass_order_pred.append(np.sign(-angle * beta(p0, p1, v0)))
+            dvardt = self.ode_func(0, var0, self.models, self.args)
+            pred_order = dvardt[-2] * np.sign(self.data.info['obst_angle'][i_trial])
+            self.pass_order_pred.append(pred_order)
             # if self.pass_order_pred[-1] != self.data.info['pass_order'][i_trial]:
                 # print(i_trial, '__________________Wrong pass order!__________________________')
         if print_time:

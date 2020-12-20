@@ -2,7 +2,6 @@
 This module contains the code to generate inputs for the experiments,
 which are randomized sequences of conditions.
 '''
-
 import random
 
 # trial list generator
