@@ -16,6 +16,7 @@ sys.modules['data_container'] = data_container
 approaches = {'fajen_approach': {}, 'acceleration_approach': {}, 'jerk_approach': {}}
 
 approaches['fajen_approach']['dual_annealing'] = {}
+approaches['fajen_approach']['dual_annealing'][-1] = {'name': 'fajen_approach', 'ps': None, 'b1': 3.25, 'k1': 7.5, 'c1': 0.4, 'c2': 0.4, 'k2': 1.4}
 approaches['fajen_approach']['dual_annealing'][0] = {'name': 'fajen_approach', 'b1': 1.3118996599538175, 'k1': 20.05817176956081, 'c1': 2.533333934342072, 'c2': 0.07555087088494414, 'k2': 0.7413974342994933, 'ps': 1.282479471344188}
 approaches['fajen_approach']['dual_annealing'][1] = {'name': 'fajen_approach', 'b1': 0.8081777207885088, 'k1': 32.80043575704669, 'c1': 8.416453555226326, 'c2': 0.03974207207189774, 'k2': 0.8136444335415792, 'ps': 1.329331601172892}
 approaches['fajen_approach']['dual_annealing'][2] = {'name': 'fajen_approach', 'b1': 0.8802412636720522, 'k1': 18.997479919723922, 'c1': 2.756441843773068, 'c2': 0.0760314647580457, 'k2': 0.9161786337522445, 'ps': 1.2233195327965638}
@@ -29,6 +30,7 @@ approaches['fajen_approach']['dual_annealing'][9] = {'name': 'fajen_approach', '
 approaches['fajen_approach']['dual_annealing'][10] = {'name': 'fajen_approach', 'b1': 1.1996934237333374, 'k1': 11.292256811441096, 'c1': 1.7756010015861, 'c2': 0.17150790956230327, 'k2': 0.4351205520904613, 'ps': 1.056705515676128}
 
 approaches['fajen_approach']['differential_evolution'] = {}
+approaches['fajen_approach']['differential_evolution'][-1] = {'name': 'fajen_approach', 'ps': None, 'b1': 3.25, 'k1': 7.5, 'c1': 0.4, 'c2': 0.4, 'k2': 1.4}
 approaches['fajen_approach']['differential_evolution'][0] = {'name': 'fajen_approach', 'b1': 1.322399694018276, 'k1': 14.876666639462048, 'c1': 5.4374557807911295, 'c2': 0.10260590846412238, 'k2': 0.7564633997176441, 'ps': 1.282479471344188}
 approaches['fajen_approach']['differential_evolution'][1] = {'name': 'fajen_approach', 'b1': 0.8179416797170797, 'k1': 16.40077656118177, 'c1': 6.417008356831993, 'c2': 0.07993938648972572, 'k2': 0.8075364662966444, 'ps': 1.329331601172892}
 approaches['fajen_approach']['differential_evolution'][2] = {'name': 'fajen_approach', 'b1': 0.8909408398978989, 'k1': 4.641459981824929, 'c1': 5.516867857632004, 'c2': 0.31100646722160424, 'k2': 0.9262495070122934, 'ps': 1.2233195327965638}
@@ -89,7 +91,7 @@ def Bai_movObst1(subject):
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
-        if (data.info['subj_id'][i] == subject and
+        if ((data.info['subj_id'][i] == subject or subject == -1) and
             data.info['obst_speed'][i] != 0 and
             abs(data.info['obst_angle'][i]) != 180):
             trials.append(i)
@@ -99,11 +101,30 @@ def Bai_movObst1(subject):
 def Bai_approach1():
     pass
 
+def Cohen_movObst1(subject):
+    file = os.path.abspath(os.path.join(os.getcwd(),
+                                        os.pardir,
+                                        'Raw_Data',
+                                        'Cohen_movObst_exp1_data.pickle'))
+    with open(file, 'rb') as f:
+        data = pickle.load(f)
+    trials = []
+    for i in range(len(data.trajs)):
+        if ((data.info['subj_id'][i] == subject or subject == -1) and
+            data.info['obst_speed'][i] and
+            data.info['ps_trial'][i] and
+            (i not in data.dump)):
+            trials.append(i)
+    simulator = ODESimulator(data=data)
+    return simulator, trials
+
 def build_simulator(experiment_name, subject):
     if experiment_name == 'Bai_movObst1':
         return Bai_movObst1(subject)
     elif experiment_name == 'Bai_approach1':
         return Bai_approach1(subject)
+    elif experiment_name == 'Cohen_movObst1':
+        return Cohen_movObst1(subject)
     else:
         print('experiment_name invalid')
 

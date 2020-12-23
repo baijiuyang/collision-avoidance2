@@ -181,7 +181,7 @@ class ODESimulator:
             self.i_trials.append(i_trial)
             self.p_subj.append(self.data.info['p_subj'][i_trial][t0:t0 + len(x)])
             dvardt = self.ode_func(0, var0, self.models, self.args)
-            pred_order = dvardt[-2] * np.sign(self.data.info['obst_angle'][i_trial])
+            pred_order = np.sign(dvardt[-2]) * np.sign(self.data.info['obst_angle'][i_trial])
             self.pass_order_pred.append(pred_order)
             # if self.pass_order_pred[-1] != self.data.info['pass_order'][i_trial]:
                 # print(i_trial, '__________________Wrong pass order!__________________________')
@@ -203,7 +203,7 @@ class ODESimulator:
                 for model in self.models:                        
                     # Use subject preferred speed
                     model['ps'] = self.data.info['ps_subj'][i]
-            if t_start == 'obst_onset':
+            if t_start == 'stimuli_onset':
                 t0 = self.data.info['stimuli_onset'][i]
             elif t_start == 'match_order':
                 t0, t1 = self.data.info['stimuli_onset'][i], self.data.info['stimuli_out'][i]
