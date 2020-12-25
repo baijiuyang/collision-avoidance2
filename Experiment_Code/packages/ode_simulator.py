@@ -64,9 +64,12 @@ class ODESimulator:
     def compute_var0(self, i_trial, t0):
         i = i_trial
         xg0, yg0 = self.data.info['p_goal'][i][t0]
-        p_obst = self.data.info['p_obst'][i]
-        xo0, yo0 = p_obst[t0]
-        vxo0, vyo0 = (p_obst[-1] - p_obst[t0]) / (len(p_obst) - 1 - t0) * self.Hz
+        if 'p_obst' in self.data.info:
+            p_obst = self.data.info['p_obst'][i]
+            xo0, yo0 = p_obst[t0]
+            vxo0, vyo0 = (p_obst[-1] - p_obst[t0]) / (len(p_obst) - 1 - t0) * self.Hz
+        else:
+            xo0 = yo0 = vxo0 = vyo0 = 0
         x0, y0 = self.data.info['p_subj'][i][t0]
         vx0, vy0 = (self.data.info['p_subj'][i][t0+1] - self.data.info['p_subj'][i][t0-1]) / 2 * self.Hz
         s0, phi0 = v2sp([vx0, vy0])
@@ -176,13 +179,13 @@ class ODESimulator:
         self.v_pred.append(np.stack((vx, vy), axis=-1))
         self.phi_pred.append(phi)
         self.s_pred.append(s)
-        p0, p1, v0, v1 = [x[-2], y[-2]], [xo[-2], yo[-2]], [vx[-2], vy[-2]], [vxo[-2], vyo[-2]]      
         if self.data:
             self.i_trials.append(i_trial)
             self.p_subj.append(self.data.info['p_subj'][i_trial][t0:t0 + len(x)])
-            dvardt = self.ode_func(0, var0, self.models, self.args)
-            pred_order = np.sign(dvardt[-2]) * np.sign(self.data.info['obst_angle'][i_trial])
-            self.pass_order_pred.append(pred_order)
+            if 'p_obst' in self.data.info:
+                dvardt = self.ode_func(0, var0, self.models, self.args)
+                pred_order = np.sign(dvardt[-2]) * np.sign(self.data.info['obst_angle'][i_trial])
+                self.pass_order_pred.append(pred_order)
             # if self.pass_order_pred[-1] != self.data.info['pass_order'][i_trial]:
                 # print(i_trial, '__________________Wrong pass order!__________________________')
         if print_time:
@@ -197,12 +200,18 @@ class ODESimulator:
 
         for i in trials:
             # Skip freewalk trial and +-180 trials
-            if self.data.info['obst_speed'][i] == 0 or abs(self.data.info['obst_angle'][i]) == 180:
+            if 'obst_speed' in self.data.info and \
+                'obst_angle' in self.data.info and \
+                (self.data.info['obst_speed'][i] == 0 or abs(self.data.info['obst_angle'][i]) == 180):
                 continue
             if ps == 'subj':
                 for model in self.models:                        
                     # Use subject preferred speed
                     model['ps'] = self.data.info['ps_subj'][i]
+            elif ps == 'trial':
+                for model in self.models:                        
+                    # Use trial preferred speed
+                    model['ps'] = self.data.info['ps_trial'][i]
             if t_start == 'stimuli_onset':
                 t0 = self.data.info['stimuli_onset'][i]
             elif t_start == 'match_order':
@@ -217,10 +226,16 @@ class ODESimulator:
                         break
             elif t_start == 'obst_out':
                 t0 = self.data.info['stimuli_out'][i]
+            else:
+                t0 = int(t_start) * self.Hz
+
             if t_end == 'obst_out':
                 t1 = self.data.info['stimuli_out'][i]
             elif t_end == 'end':
                 t1 = len(self.data.trajs[i]) - 1
+            else:
+                t1 = len(self.data.trajs[i]) - abs(int(t_end)) * self.Hz
+
             self.t0[i], self.t1[i] = t0, t1
             self.var0[i] = self.compute_var0(i, t0)
             
@@ -245,7 +260,8 @@ class ODESimulator:
         ws = [0.4, w_goal, w_obst]
         labels = ['pred', 'goal', 'obst']
         if self.data:
-            if self.data.info['obst_speed'][j_trial] == 0 or abs(self.data.info['obst_angle'][j_trial]) == 180:
+            if 'obst_speed' in self.data.info and 'obst_angle' in self.data.info and \
+            (self.data.info['obst_speed'][j_trial] == 0 or abs(self.data.info['obst_angle'][j_trial]) == 180):
                 print('This trial is not simulated')
                 return
             w_goal, w_obst = self.data.info['w_goal'], self.data.info['w_obst']

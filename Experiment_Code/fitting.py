@@ -44,7 +44,8 @@ approaches['fajen_approach']['differential_evolution'][9] = {'name': 'fajen_appr
 approaches['fajen_approach']['differential_evolution'][10] = {'name': 'fajen_approach', 'b1': 1.2398029027292385, 'k1': 14.369326267732422, 'c1': 0.7651801554578793, 'c2': 0.13957426997817068, 'k2': 0.4360750101027109, 'ps': 1.056705515676128}
 
 model_bounds = {}
-model_bounds['fajen_approach'] = [(0, 30), (0, 70), (0, 10), (0, 10), (0, 10)]
+model_bounds['fajen_approach'] = [(0, 10), (0, 20), (0, 5), (0, 5), (0, 5)]
+model_bounds['fajen_approach2'] = [(0, 10), (0, 20), (0, 5), (0, 5), (0, 10), (0, 20)]
 model_bounds['cohen_avoid'] = [(0, 50), (0, 800), (0.1, 20), (0.1, 10), (0, 50), (0, 800), (0.1, 10), (0.1, 10)]
 
 
@@ -64,7 +65,7 @@ def create_cmd_args():
     args = parser.parse_args()
     if not any(args.__dict__.values()):
         return False
-    args.training_model_type = args.training_model.split('_')[-1]
+    args.training_model_type = args.training_model.split('_')[-1][:3]
     return args
     
 def get_input_args():
@@ -79,7 +80,7 @@ def get_input_args():
     args.approach_model = input('Type approach_model (fajen_approach/acceleration_approach/jerk_approach):\n') 
     args.avoid_model = input('Type avoid_model (cohen_avoid):\n')
     args.training_model = input('Type training_model:\n')
-    args.training_model_type = args.training_model.split('_')[-1]
+    args.training_model_type = args.training_model.split('_')[-1][:3]
     return args
 
 def Bai_movObst1(subject):
@@ -98,9 +99,25 @@ def Bai_movObst1(subject):
     simulator = ODESimulator(data=data)
     return simulator, trials
 
-def Bai_approach1():
+def Bai_movObst1b():
     pass
 
+def Fajen_steer1a(subject):
+    file = os.path.abspath(os.path.join(os.getcwd(),
+                                        os.pardir,
+                                        'Raw_Data',
+                                        'Fajen_steer_exp1a_data.pickle'))
+    with open(file, 'rb') as f:
+        data = pickle.load(f)
+    trials = []
+    for i in range(len(data.trajs)):
+        if ((data.info['subj_id'][i] == subject or subject == -1) and
+            data.info['ps_trial'][i] and
+            (i not in data.dump)):
+            trials.append(i)
+    simulator = ODESimulator(data=data)
+    return simulator, trials
+    
 def Cohen_movObst1(subject):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
@@ -125,6 +142,8 @@ def build_simulator(experiment_name, subject):
         return Bai_approach1(subject)
     elif experiment_name == 'Cohen_movObst1':
         return Cohen_movObst1(subject)
+    elif experiment_name == 'Fajen_steer1a':
+        return Fajen_steer1a(subject)
     else:
         print('experiment_name invalid')
 
@@ -133,17 +152,19 @@ def error(x, simulator, trials, logfile, args):
     i_iter += 1
     print(f'iter {i_iter:03d}, subj{args.subject}, {args.training_model}, '
         f'x = ', [f'{a:0.3f}' for a in x])
-    if args.training_model_type == 'approach':
+    if args.training_model_type == 'app':
         if args.approach_model == 'fajen_approach':
             simulator.models = [{'name': 'fajen_approach',
                  'b1': x[0], 'k1': x[1], 'c1': x[2], 'c2': x[3], 'k2': x[4]}]
+        elif args.approach_model == 'fajen_approach2':
+            simulator.models = [{'name': 'fajen_approach2',
+                 'b1': x[0], 'k1': x[1], 'c1': x[2], 'c2': x[3], 'b2': x[4], 'k2': x[5]}]
         elif args.approach_model == 'acceleration_approach':
-            pass
-        elif args.approach_model == 'jerk_approach':
+            print('empty approach model')
             pass
         else:
             print('approach_model invalid')
-    elif args.training_model_type == 'avoid':
+    elif args.training_model_type == 'avo':
         approach = approaches[args.approach_model][args.method][args.subject]
         if args.avoid_model == 'cohen_avoid':
             avoid = {'name': 'cohen_avoid',
@@ -156,7 +177,7 @@ def error(x, simulator, trials, logfile, args):
         print('training model type is invalid')  
     simulator.simulate_all(trials=trials, t_start=args.t_start, t_end=args.t_end, ps=args.ps)
     err = simulator.test('p_dist')
-    if args.training_model_type == 'avoid':
+    if args.training_model_type == 'avo':
         accuracy = simulator.test('order_accuracy')
     else:
         accuracy = None
