@@ -12,7 +12,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, accuracy_sc
 from packages.helper import play_trajs, sp2a, sp2v, psi, beta, d_theta, \
                             d_psi, hms, v2sp, dist, min_sep, av2dsdp, min_dist
 from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_avoid2, \
-                            cohen_avoid3, cohen_avoid4, vector_approach, perpendicular_avoid
+                            cohen_avoid3, cohen_avoid4, vector_approach, perpendicular_avoid, \
+                            cohen_avoid4_thres
 
 
 class ODESimulator:
@@ -137,6 +138,9 @@ class ODESimulator:
                     output[key] += val
             elif model['name'] == 'cohen_avoid4':
                 for key, val in cohen_avoid4(model, beta_o, d_theta_o, d_psi_o).items():
+                    output[key] += val
+            elif model['name'] == 'cohen_avoid4_thres':
+                for key, val in cohen_avoid4_thres(model, beta_o, d_theta_o, d_psi_o).items():
                     output[key] += val
             elif model['name'] == 'perpendicular_avoid':
                 for key, val in perpendicular_avoid(model, beta_o, psi_o, theta_o, d_theta_o, d_psi_o, ref).items():

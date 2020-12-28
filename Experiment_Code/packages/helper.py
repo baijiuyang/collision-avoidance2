@@ -691,4 +691,14 @@ def scatter3d(x, y, z, cs=None, colorsMap='gist_rainbow', fig=None, ax=None):
     scalarMap.set_array(cs)
     fig.colorbar(scalarMap)
 
+def plot_speed(traj, Hz):
+    s = traj_speed(traj, Hz)
+    t = np.linspace(0, len(traj)-1, len(traj)) / Hz
+    plt.plot(t, s)    
+    return plt.gca()
     
+def plot_heading(traj, Hz, ref=[0, 1]):
+    phi = v2sp(np.gradient(traj, axis=0) * Hz, ref=ref)[1]
+    t = np.linspace(0, len(traj)-1, len(traj)) / Hz
+    plt.plot(t, phi, label=str(id))
+    return plt.gca()

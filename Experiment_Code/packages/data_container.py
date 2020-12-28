@@ -48,7 +48,7 @@ class Data:
         # remove pads 
         return data[pad * Hz + 1 : -pad * Hz + 1]
         
-    def get_traj(self, i_traj, col=[0, 2], **kwargs):
+    def get_traj(self, i_traj, col, **kwargs):
         # load kwargs
         order = 4 if 'order' not in kwargs else kwargs['order']
         cutoff = 0.6 if 'cutoff' not in kwargs else kwargs['cutoff']
