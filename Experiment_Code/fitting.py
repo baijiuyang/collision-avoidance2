@@ -55,6 +55,8 @@ approaches['Fajen_steer1a']['fajen_approach2']['differential_evolution'][-1] = {
 model_bounds = {}
 model_bounds['fajen_approach'] = [(0, 10), (0, 20), (0, 5), (0, 5), (0, 5)]
 model_bounds['fajen_approach2'] = [(0, 10), (0, 20), (0, 5), (0, 5), (0, 10), (0, 20)]
+model_bounds['acceleration_approach'] = [(0, 10)]
+model_bounds['jerk_approach'] = [(0, 100), (0, 50)]
 model_bounds['cohen_avoid'] = [(0, 50), (0, 800), (0.1, 20), (0.1, 10), (0, 50), (0, 800), (0.1, 10), (0.1, 10)]
 model_bounds['cohen_avoid4_thres'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30), (0, 0.1)]
 
@@ -172,8 +174,11 @@ def error(x, simulator, trials, logfile, args):
             simulator.models = [{'name': 'fajen_approach2',
                  'b1': x[0], 'k1': x[1], 'c1': x[2], 'c2': x[3], 'b2': x[4], 'k2': x[5]}]
         elif args.approach_model == 'acceleration_approach':
-            print('empty approach model')
-            pass
+            simulator.models = [{'name': 'acceleration_approach',
+                 'k': x[0]}]
+        elif args.approach_model == 'jerk_approach':
+            simulator.models = [{'name': 'jerk_approach',
+                 'k': x[0], 'b': x[1]}]         
         else:
             print('approach_model invalid')
     elif args.training_model_type == 'avo':

@@ -10,10 +10,10 @@ from numpy.linalg import norm
 from numpy import sqrt, gradient
 from sklearn.metrics import mean_squared_error, mean_absolute_error, accuracy_score
 from packages.helper import play_trajs, sp2a, sp2v, psi, beta, d_theta, \
-                            d_psi, hms, v2sp, dist, min_sep, av2dsdp, min_dist
+                            d_psi, hms, v2sp, dist, min_sep, va2dsdp, min_dist
 from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_avoid2, \
-                            cohen_avoid3, cohen_avoid4, vector_approach, perpendicular_avoid, \
-                            cohen_avoid4_thres
+                            cohen_avoid3, cohen_avoid4, acceleration_approach, \
+                            perpendicular_avoid, cohen_avoid4_thres, jerk_approach
 
 
 class ODESimulator:
@@ -66,18 +66,17 @@ class ODESimulator:
         i = i_trial
         xg0, yg0 = self.data.info['p_goal'][i][t0]
         if 'p_obst' in self.data.info:
-            p_obst = self.data.info['p_obst'][i]
-            xo0, yo0 = p_obst[t0]
-            vxo0, vyo0 = (p_obst[-1] - p_obst[t0]) / (len(p_obst) - 1 - t0) * self.Hz
+            xo0, yo0 = self.data.info['p_obst'][i][t0]
+            vxo0, vyo0 = self.data.info['v_obst'][i][t0]
         else:
             xo0 = yo0 = vxo0 = vyo0 = 0
         x0, y0 = self.data.info['p_subj'][i][t0]
-        vx0, vy0 = (self.data.info['p_subj'][i][t0+1] - self.data.info['p_subj'][i][t0-1]) / 2 * self.Hz
+        vx0, vy0 = self.data.info['v_subj'][i][t0]
+        a0 = self.data.info['a_subj'][i][t0]
         s0, phi0 = v2sp([vx0, vy0])
-        v_pre = (self.data.info['p_subj'][i][t0] - self.data.info['p_subj'][i][t0-2]) / 2 * self.Hz
-        v_post = (self.data.info['p_subj'][i][t0+2] - self.data.info['p_subj'][i][t0]) / 2 * self.Hz
-        a0 = (v_post - v_pre) / 2 * self.Hz
-        _, dphi0 = av2dsdp([vx0, vy0], a0)
+        v_pre = self.data.info['v_subj'][i][t0-1]
+        v_post = self.data.info['v_subj'][i][t0+1]
+        _, dphi0 = va2dsdp([vx0, vy0], a0)
         ds0 = (norm(v_post) - norm(v_pre)) / 2 * self.Hz
         return xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, phi0, s0, dphi0, ds0
 
@@ -124,8 +123,11 @@ class ODESimulator:
             elif model['name'] == 'fajen_approach2':
                 for key, val in fajen_approach2(model, phi, dphi, s, ds, psi_g, r_g).items():
                     output[key] += val
-            elif model['name'] == 'vector_approach':
-                for key, val in vector_approach(model, [x, y], [xg, yg], [vx, vy]).items():
+            elif model['name'] == 'acceleration_approach':
+                for key, val in acceleration_approach(model, [x, y], [xg, yg], [vx, vy]).items():
+                    output[key] += val
+            elif model['name'] == 'jerk_approach':
+                for key, val in jerk_approach(model, [x, y], [xg, yg], [vx, vy]).items():
                     output[key] += val
             elif model['name'] == 'cohen_avoid':
                 for key, val in cohen_avoid(model, dphi, beta_o, d_psi_o, r_o, s).items():
@@ -145,6 +147,9 @@ class ODESimulator:
             elif model['name'] == 'perpendicular_avoid':
                 for key, val in perpendicular_avoid(model, beta_o, psi_o, theta_o, d_theta_o, d_psi_o, ref).items():
                     output[key] += val
+            elif model['name'] == 'perpendicular_avoid2':
+                for key, val in perpendicular_avoid2(model, beta_o, psi_o, theta_o, d_theta_o, d_psi_o, ref).items():
+                    output[key] += val
         if 'ds' in output:
             ddphi, ds = output['ddphi'], output['ds']
             dds = 0
@@ -153,7 +158,9 @@ class ODESimulator:
             ddphi, dds = output['ddphi'], output['dds']
             ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
         elif 'a' in output:
-            pass
+            ax, ay = output['a']
+            ds, dphi = va2dsdp([vx, vy], [ax, ay])
+            ddphi = dds = 0
 
         dvardt = [0, 0, vxo, vyo, 0, 0, vx, vy, ax, ay, dphi, ds, ddphi, dds]
         return dvardt
@@ -252,7 +259,7 @@ class ODESimulator:
         toc = time.perf_counter()
         print(f'Simulated {n_trials} trials in {hms(toc - tic):s}')
 
-    def play(self, i_trial=0, actual=False, title=None, colors=None, interval=None, save=False):
+    def play(self, i_trial=0, title=None, colors=None, interval=None, save=False):
         '''
         Args:
             interval (float): The pause between two frames in millisecond.
@@ -271,24 +278,14 @@ class ODESimulator:
             w_goal, w_obst = self.data.info['w_goal'], self.data.info['w_obst']
             ws.append(0.4)
             labels.append('subj')
-            p_subj = self.data.get_traj(j_trial)            
+            p_subj = self.data.info['p_subj'][j_trial]            
             # Pad values to p_pred to give it the same length as p_subj
             t0 = self.t0[j_trial]
             p_pred = np.zeros_like(p_subj)
             p_pred[t0: t0+len(self.p_pred[i_trial])] = self.p_pred[i_trial]            
             # p_pred[:t0], p_pred[t0+len(self.p_pred[i_trial]):] = p_pred[t0], p_pred[t0+len(self.p_pred[i_trial])-1]
             p_pred[:t0], p_pred[t0+len(self.p_pred[i_trial]):] = None, None
-            if actual:
-                p_goal, p_obst = self.data.info['p_goal'][j_trial], self.data.info['p_obst'][j_trial]
-            else:
-                # Pad values to simulated trajs to give them the same length as data
-                p_goal = np.zeros_like(p_subj)
-                p_goal[t0: t0+len(self.p_goal[i_trial])] = self.p_goal[i_trial]
-                p_goal[:t0], p_goal[t0+len(self.p_goal[i_trial]):] = p_goal[t0], p_goal[t0+len(self.p_goal[i_trial])-1]
-                p_obst = np.zeros_like(p_subj)
-                p_obst[t0: t0+len(self.p_obst[i_trial])] = self.p_obst[i_trial]
-                p_obst[:t0], p_obst[t0+len(self.p_obst[i_trial]):] = p_obst[t0], p_obst[t0+len(self.p_obst[i_trial])-1]
-                
+            p_goal, p_obst = self.data.info['p_goal'][j_trial], self.data.info['p_obst'][j_trial]                
             trajs = [p_pred, p_goal, p_obst, p_subj]
         else:
             trajs = [self.p_pred[i_trial], self.p_goal[i_trial], self.p_obst[i_trial]]

@@ -37,6 +37,12 @@ def inner(x, y):
             retval[i] = inner(x[i], y[i])
         return retval
 
+def vector_angle(vec0, vec1):
+    return arccos(inner(vec0, vec1) / (norm(vec0, axis=-1) * norm(vec1, axis=-1)))
+
+def signed_angle(vec0, vec1):
+    return vector_angle(vec0, vec1) * side(vec0, vec1)
+
 def dist(p0, p1):
     return norm(np.array(p1) - np.array(p0), axis=-1)
     
@@ -186,7 +192,7 @@ def sp2a(s, d_s, phi, d_phi, ref=[0, 1]):
             accs[i] = _sp2a(s[i], d_s[i], phi[i], d_phi[i], ref)
         return accs
 
-def av2dsdp(v, a):
+def va2dsdp(v, a):
     '''
     Computes rate of change of speed and heading based on vector acceleration.
     
@@ -198,7 +204,7 @@ def av2dsdp(v, a):
         d_phi (float or np array of floats): Rate of change of heading in rad/s).
             Positive mean clockwise heading change.
     '''
-    def _av2dsdp(v, a):
+    def _va2dsdp(v, a):
         if v[0] == 0 and v[1] == 0:
             d_s = norm(a)
             d_phi = 0
@@ -207,11 +213,11 @@ def av2dsdp(v, a):
             d_phi = inner(a, rotate(v, math.pi / 2)) / norm(v) ** 2 # correctly signed
         return d_s, d_phi
     if len(np.shape(a)) == 1:
-        return _av2dsdp(v, a)
+        return _va2dsdp(v, a)
     else:
         d_ss, d_phis = np.zeros(len(a)), np.zeros(len(a))
         for i in range(len(d_ss)):
-            d_ss[i], d_phis[i] = _av2dsdp(v[i], a[i])
+            d_ss[i], d_phis[i] = _va2dsdp(v[i], a[i])
         return np.stack((d_ss, d_phis), axis=-1)
     
 def theta(p0, p1, w):
@@ -267,7 +273,7 @@ def d_theta_numeric(p0, p1, w, Hz):
     d_thatas = np.diff(thetas)
     return np.append(d_thatas, d_thatas[-1]) * Hz # Pad to the length of p0.
 
-def side(r01, v0):
+def side(v0, r01):
     '''
     Computes the side that agent 1 belongs given the postion and velocity of agent 0.
     Rotate v0 (x, y) 90 degree clockwise get v0' = (y, -x). If the sign of inner(v0', r01)
@@ -280,7 +286,15 @@ def side(r01, v0):
     Return:
         (int): 1 right side, -1 left side, 0 perfectly in front.
     '''
-    return np.sign(v0[1] * r01[0] - v0[0] * r01[1])
+    def _side(v0, r01):
+        return np.sign(v0[1] * r01[0] - v0[0] * r01[1])
+    if len(np.shape(v0)) == 1:
+        return _side(v0, r01)
+    else:
+        sides = np.zeros(len(v0))
+        for i in range(len(sides)):
+            sides[i] = _side(v0[i], r01[i])
+        return sides
 
 def beta(p0, p1, v0):
     '''
@@ -304,11 +318,9 @@ def beta(p0, p1, v0):
         s0 = norm(v0)
         if r == 0 or s0 == 0:
             return 0
-        angle = arccos(inner(v0, r01) / (s0 * r))
+        angle = arccos(inner(v0, r01) / (s0 * r)) * side(v0, r01)
         if math.isnan(angle):
             return 0
-        if side(r01, v0) < 0: 
-            angle = -angle
         return angle
 
     if len(np.shape(p0)) == 1:
