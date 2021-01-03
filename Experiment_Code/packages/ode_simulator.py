@@ -194,8 +194,9 @@ class ODESimulator:
             self.i_trials.append(i_trial)
             self.p_subj.append(self.data.info['p_subj'][i_trial][t0:t0 + len(x)])
             if 'p_obst' in self.data.info:
-                dvardt = self.ode_func(0, var0, self.models, self.args)
-                pred_order = np.sign(dvardt[-2]) * np.sign(self.data.info['obst_angle'][i_trial])
+                _beta = beta([x[-1], y[-1]], [xo[-1], yo[-1]], [vx[-1], vy[-1]])
+                angle = self.data.info['obst_angle'][i_trial]
+                pred_order = np.sign(_beta * -angle)
                 self.pass_order_pred.append(pred_order)
             # if self.pass_order_pred[-1] != self.data.info['pass_order'][i_trial]:
                 # print(i_trial, '__________________Wrong pass order!__________________________')
