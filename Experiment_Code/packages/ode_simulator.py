@@ -293,7 +293,7 @@ class ODESimulator:
 
         play_trajs(trajs, ws, self.Hz, ref=self.ref, title=title, labels=labels, colors=colors, interval=interval, save=save)
 
-    def test(self, metric, i_trial=None):
+    def test(self, metric, i_trial=None, all_errors=False):
         '''
         Metric has the format of "var_alg". Var can be 'p': position,
         'v': velocity, 'a': acceleration, 's': speed, 'phi': heading, or
@@ -341,4 +341,6 @@ class ODESimulator:
                 vals.append(mean_squared_error(trues[i], preds[i]))
             elif alg == 'RMSE':
                 vals.append(np.sqrt(mean_squared_error(trues[i], preds[i])))  
+        if all_errors:
+            return vals
         return np.mean(vals)    
