@@ -72,13 +72,13 @@ class ODESimulator:
             xo0 = yo0 = vxo0 = vyo0 = 0
         x0, y0 = self.data.info['p_subj'][i][t0]
         vx0, vy0 = self.data.info['v_subj'][i][t0]
-        a0 = self.data.info['a_subj'][i][t0]
+        a0 = norm(self.data.info['a_subj'][i][t0], axis=-1)        
         s0, phi0 = v2sp([vx0, vy0])
         v_pre = self.data.info['v_subj'][i][t0-1]
         v_post = self.data.info['v_subj'][i][t0+1]
         _, dphi0 = va2dsdp([vx0, vy0], a0)
         ds0 = (norm(v_post) - norm(v_pre)) / 2 * self.Hz
-        return xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, phi0, s0, dphi0, ds0
+        return xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, a0, phi0, s0, dphi0, ds0
 
     @staticmethod
     def odeEuler(f, t, y0, args=None):
@@ -106,7 +106,7 @@ class ODESimulator:
         return y
         
     def ode_func(self, t, var, models, args):
-        xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi, ds = var
+        xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = var
         ref, w_goal, w_obst = self.ref, args['w_goal'], args['w_obst']
         r_g = dist([x, y], [xg, yg])
         r_o = dist([x, y], [xo, yo])
@@ -152,17 +152,19 @@ class ODESimulator:
                     output[key] += val
         if 'ds' in output:
             ddphi, ds = output['ddphi'], output['ds']
-            dds = 0
+            dds = jx = jy = 0
             ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
         elif 'dds' in output:
             ddphi, dds = output['ddphi'], output['dds']
             ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
+            jx = jy = 0
         elif 'a' in output:
             ax, ay = output['a']
             ds, dphi = va2dsdp([vx, vy], [ax, ay])
-            ddphi = dds = 0
-
-        dvardt = [0, 0, vxo, vyo, 0, 0, vx, vy, ax, ay, dphi, ds, ddphi, dds]
+            ddphi = dds = jx = jy = 0
+        elif 'da' in output:
+            pass
+        dvardt = [0, 0, vxo, vyo, 0, 0, vx, vy, ax, ay, da, dphi, ds, ddphi, dds]
         return dvardt
     
     def simulate(self, var0, t0=None, t1=None, total_time=None, i_trial=None, print_trial=False, print_time=True):
@@ -177,13 +179,13 @@ class ODESimulator:
             t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
 
         sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0, method='BDF', t_eval=t_eval, args=[self.models, self.args])
-        xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi, ds = sol.y
+        xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = sol.y
         if len(x) != len(t_eval):
             print("simulation ended early, switch to Euler method")
             t_eval2 = t_eval[ : len(t_eval)-len(x)]
-            var0 = [xg[-1], yg[-1], xo[-1], yo[-1], vxo[-1], vyo[-1], x[-1], y[-1], vx[-1], vy[-1], phi[-1], s[-1], dphi[-1], ds[-1]]
+            var0 = [xg[-1], yg[-1], xo[-1], yo[-1], vxo[-1], vyo[-1], x[-1], y[-1], vx[-1], vy[-1], a[-1], phi[-1], s[-1], dphi[-1], ds[-1]]
             y2 = ODESimulator.odeEuler(self.ode_func, t_eval2, var0, args=[self.models, self.args])
-            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, phi, s, dphi, ds = np.concatenate((sol.y, np.transpose(y2)), axis=1)
+            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = np.concatenate((sol.y, np.transpose(y2)), axis=1)
         self.p_pred.append(np.stack((x, y), axis=-1))
         self.p_obst.append(np.stack((xo, yo), axis=-1))
         self.p_goal.append(np.stack((xg, yg), axis=-1))
@@ -295,9 +297,9 @@ class ODESimulator:
 
     def test(self, metric, i_trial=None, all_errors=False):
         '''
-        Metric has the format of "var_alg". Var can be 'p': position,
+        Metric has the format of "var_alg". "var" can be 'p': position,
         'v': velocity, 'a': acceleration, 's': speed, 'phi': heading, or
-        'dca': signed distance of the closest approach. Alg can be
+        'dca': signed distance of the closest approach. "alg" can be
         'dist': average distance, 'MAE': mean absolute error, 'MSE': mean
         squared error, or 'RMSE': root mean squared error.
         '''

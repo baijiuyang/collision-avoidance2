@@ -63,9 +63,12 @@ def acceleration_approach(args, p0, p1, v0):
     a = k * (vp - array(v0))
     return {'a': a}
 
-def jerk_approach(args, p0, p1, v0):
+def da_approach(args, p0, p1, v0, a0):
     ps, k, b = args['ps'], args['k'], args['b']
-    
+    vi = array(p1) - array(p0)
+    vp = vi * ps / norm(vi, axis=-1)
+    j = k * (vp - array(v0)) - b * array(a0)
+    return {'ia': ia, 'da': da}
 
 def perpendicular_avoid(args, beta, psi, theta, dtheta, dpsi, ref):
     k, c = args['k'], args['c']
@@ -84,3 +87,6 @@ def perpendicular_avoid2(args, beta, psi, theta, dtheta, dpsi, ref):
     a_mag = k * maximum(0, ratio) * indicator
     a = rotate([i * a_mag for i in ref], alpha)
     return {'a': a}
+
+def perpendicular_avoid3():
+    pass
