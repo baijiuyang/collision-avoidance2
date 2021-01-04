@@ -5,6 +5,8 @@ import numpy as np
 from math import pi
 from numpy import absolute, exp, sign, array, maximum
 from numpy.linalg import norm
+from packages.helper import rotate
+
 '''{'name': 'fajen_approach', 'ps': None,
                   'b1': 3.25, 'k1': 7.5, 'c1': 0.4, 'c2': 0.4, 'k2': 1.4}'''
 def fajen_approach(args, phi, dphi, s, psi, r):    

@@ -51,6 +51,9 @@ approaches['Fajen_steer1a']['fajen_approach']['differential_evolution'][-1] = {'
 approaches['Fajen_steer1a']['fajen_approach2']['differential_evolution'] = {}
 approaches['Fajen_steer1a']['fajen_approach2']['differential_evolution'][-1] = {'name': 'fajen_approach2', 'b1':2.04992354, 'k1':2.85641543, 'c1':0.54294928, 'c2':0.73857217, 'b2':3.89580222, 'k2':5.04511601}
 
+approaches['Fajen_steer1a']['acceleration_approach']['differential_evolution'] = {}
+approaches['Fajen_steer1a']['acceleration_approach']['differential_evolution'][-1] = {'name': 'acceleration_approach', 'k': 0.9220813483746707}
+
 
 model_bounds = {}
 model_bounds['fajen_approach'] = [(0, 10), (0, 20), (0, 5), (0, 5), (0, 5)]
@@ -59,6 +62,8 @@ model_bounds['acceleration_approach'] = [(0, 10)]
 model_bounds['jerk_approach'] = [(0, 100), (0, 50)]
 model_bounds['cohen_avoid'] = [(0, 50), (0, 800), (0.1, 20), (0.1, 10), (0, 50), (0, 800), (0.1, 10), (0.1, 10)]
 model_bounds['cohen_avoid4_thres'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30), (0, 0.1)]
+model_bounds['perpendicular_avoid'] = [(0, 100), (0.0001, 10)]
+model_bounds['perpendicular_avoid2'] = [(0, 100), (0.0001, 10)]
 
 
 i_iter = 0
@@ -191,6 +196,9 @@ def error(x, simulator, trials, logfile, args):
             avoid = {'name': 'cohen_avoid4_thres',
              'k1': x[0], 'c5': x[1], 'c6': x[2],
              'k2': x[3], 'c7': x[4], 'c8': x[5], 'thres': x[6]}
+        elif args.avoid_model == 'perpendicular_avoid':
+            avoid = {'name': 'perpendicular_avoid',
+                'k': x[0], 'c': x[1]}
         else:
             print('avoid_model invalid')
         simulator.models = [approach, avoid]

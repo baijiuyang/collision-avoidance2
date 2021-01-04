@@ -10,10 +10,11 @@ from numpy.linalg import norm
 from numpy import sqrt, gradient
 from sklearn.metrics import mean_squared_error, mean_absolute_error, accuracy_score
 from packages.helper import play_trajs, sp2a, sp2v, psi, beta, d_theta, \
-                            d_psi, hms, v2sp, dist, min_sep, va2dsdp, min_dist
+                            d_psi, hms, v2sp, dist, min_sep, va2dsdp, min_dist,\
+                            theta
 from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_avoid2, \
                             cohen_avoid3, cohen_avoid4, acceleration_approach, \
-                            perpendicular_avoid, cohen_avoid4_thres, jerk_approach
+                            perpendicular_avoid, cohen_avoid4_thres
 
 
 class ODESimulator:
@@ -72,11 +73,12 @@ class ODESimulator:
             xo0 = yo0 = vxo0 = vyo0 = 0
         x0, y0 = self.data.info['p_subj'][i][t0]
         vx0, vy0 = self.data.info['v_subj'][i][t0]
-        a0 = norm(self.data.info['a_subj'][i][t0], axis=-1)        
+        ax, ay = self.data.info['a_subj'][i][t0]
+        a0 = norm([ax, ay])        
         s0, phi0 = v2sp([vx0, vy0])
         v_pre = self.data.info['v_subj'][i][t0-1]
         v_post = self.data.info['v_subj'][i][t0+1]
-        _, dphi0 = va2dsdp([vx0, vy0], a0)
+        _, dphi0 = va2dsdp([vx0, vy0], [ax, ay])
         ds0 = (norm(v_post) - norm(v_pre)) / 2 * self.Hz
         return xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, a0, phi0, s0, dphi0, ds0
 
@@ -112,6 +114,8 @@ class ODESimulator:
         r_o = dist([x, y], [xo, yo])
         psi_g = psi([x, y], [xg, yg], ref=ref)
         beta_o = beta([x, y], [xo, yo], [vx, vy])
+        theta_o = theta([x, y], [xo, yo], w_obst)
+        psi_o = psi([x, y], [xo, yo], ref=ref)
         d_theta_o = d_theta([x, y], [xo, yo], [vx, vy], [vxo, vyo], w_obst)
         d_psi_o = d_psi([x, y], [xo, yo], [vx, vy], [vxo, vyo])
         
@@ -152,16 +156,16 @@ class ODESimulator:
                     output[key] += val
         if 'ds' in output:
             ddphi, ds = output['ddphi'], output['ds']
-            dds = jx = jy = 0
+            dds = da = 0
             ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
         elif 'dds' in output:
             ddphi, dds = output['ddphi'], output['dds']
             ax, ay = sp2a(s, ds, phi, dphi, ref=ref)
-            jx = jy = 0
+            da = 0
         elif 'a' in output:
             ax, ay = output['a']
             ds, dphi = va2dsdp([vx, vy], [ax, ay])
-            ddphi = dds = jx = jy = 0
+            ddphi = dds = da = 0
         elif 'da' in output:
             pass
         dvardt = [0, 0, vxo, vyo, 0, 0, vx, vy, ax, ay, da, dphi, ds, ddphi, dds]
