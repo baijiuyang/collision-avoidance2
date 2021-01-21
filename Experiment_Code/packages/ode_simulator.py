@@ -14,7 +14,7 @@ from packages.helper import play_trajs, sp2a, sp2v, psi, beta, d_theta, \
                             theta
 from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_avoid2, \
                             cohen_avoid3, cohen_avoid4, acceleration_approach, \
-                            perpendicular_avoid, cohen_avoid4_thres
+                            perpendicular_avoid, cohen_avoid4_thres, perpendicular_avoid2
 
 
 class ODESimulator:
