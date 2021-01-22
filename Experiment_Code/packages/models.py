@@ -32,34 +32,35 @@ def cohen_avoid(args, dphi, beta, dpsi, r, s):
 # Known issue: When dpsi is zero, it becomes a null model.
 def cohen_avoid2(args, dphi, s, beta, dtheta, dpsi):
     ps, b1, k1, c5, c6, b2, k2, c7, c8 = args['ps'], args['b1'], args['k1'], args['c5'], args['c6'], args['b2'], args['k2'], args['c7'], args['c8']
-    sigmoid = 1 / (1 + exp(20 * (absolute(beta) - 1.3)))
-    ddphi = -b1 * dphi - dpsi * k1 * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * sigmoid
-    ds = b2 * (ps - s) + sign(beta) * dpsi * k2 * exp(-c7 * absolute(dpsi)) * (1 - exp(-c8 * maximum(0, dtheta))) * sigmoid
+    indicator = absolute(beta) < pi/2
+    ddphi = -b1 * dphi - dpsi * k1 * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * indicator
+    ds = b2 * (ps - s) + sign(beta) * dpsi * k2 * exp(-c7 * absolute(dpsi)) * (1 - exp(-c8 * maximum(0, dtheta))) * indicator
     return {'ds': ds, 'ddphi': ddphi}
 
 # Known issue: When dpsi is zero, it becomes a null model.
 def cohen_avoid3(args, beta, dtheta, dpsi):
     k1, c5, c6, k2, c7, c8 = args['k1'], args['c5'], args['c6'], args['k2'], args['c7'], args['c8']
-    sigmoid = 1 / (1 + exp(20 * (absolute(beta) - 1.3)))
-    dds = k2 * sign(beta) * dpsi * exp(-c7 * absolute(dpsi)) * (1 - exp(-c8 * maximum(0, dtheta))) * sigmoid
-    ddphi = -k1 * dpsi * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * sigmoid
+    indicator = absolute(beta) < pi/2
+    dds = k2 * sign(beta) * dpsi * exp(-c7 * absolute(dpsi)) * (1 - exp(-c8 * maximum(0, dtheta))) * indicator
+    ddphi = -k1 * dpsi * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * indicator
     return {'dds': dds, 'ddphi': ddphi}
 
 # Known issue: When dpsi is zero, it becomes a null model.
 def cohen_avoid4(args, beta, dtheta, dpsi):
     k1, c5, c6, k2, c7, c8 = args['k1'], args['c5'], args['c6'], args['k2'], args['c7'], args['c8']
-    sigmoid = 1 / (1 + exp(20 * (absolute(beta) - 1.3)))
-    dds = k2 * sign(beta) * sign(dpsi) * exp(-c7 * absolute(dpsi)) * (1 - exp(-c8 * maximum(0, dtheta))) * sigmoid
-    ddphi = -k1 * sign(dpsi) * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * sigmoid
+    indicator = absolute(beta) < pi/2
+    dds = k2 * sign(beta) * sign(dpsi) * exp(-c7 * absolute(dpsi)) * (1 - exp(-c8 * maximum(0, dtheta))) * indicator
+    ddphi = -k1 * sign(dpsi) * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * indicator
     return {'dds': dds, 'ddphi': ddphi}
 
 # Known issue: When dpsi is zero, it becomes a null model.
 def cohen_avoid4_thres(args, beta, dtheta, dpsi):
     k1, c5, c6, k2, c7, c8, thres = args['k1'], args['c5'], args['c6'], args['k2'], args['c7'], args['c8'], args['thres']
     dpsi = sign(dpsi) * maximum(abs(dpsi) - thres, 0)
-    sigmoid = 1 / (1 + exp(20 * (absolute(beta) - 1.3)))
-    dds = k2 * sign(beta) * sign(dpsi) * exp(-c7 * absolute(dpsi)) * (1 - exp(-c8 * maximum(0, dtheta))) * sigmoid
-    ddphi = -k1 * sign(dpsi) * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * sigmoid
+    # sigmoid = 1 / (1 + exp(20 * (absolute(beta) - 1.3)))
+    indicator = absolute(beta) < pi/2
+    dds = k2 * sign(beta) * sign(dpsi) * exp(-c7 * absolute(dpsi)) * (1 - exp(-c8 * maximum(0, dtheta))) * indicator
+    ddphi = -k1 * sign(dpsi) * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * indicator
     return {'dds': dds, 'ddphi': ddphi}
 
 def acceleration_approach(args, p0, p1, v0):

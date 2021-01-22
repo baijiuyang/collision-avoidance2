@@ -61,6 +61,9 @@ model_bounds['fajen_approach2'] = [(0, 10), (0, 20), (0, 5), (0, 5), (0, 10), (0
 model_bounds['acceleration_approach'] = [(0, 10)]
 model_bounds['jerk_approach'] = [(0, 100), (0, 50)]
 model_bounds['cohen_avoid'] = [(0, 50), (0, 800), (0.1, 20), (0.1, 10), (0, 50), (0, 800), (0.1, 10), (0.1, 10)]
+model_bounds['cohen_avoid2'] = [(0, 50), (0, 800), (0.1, 10), (1, 30), (0, 50), (0, 800), (0.1, 10), (1, 30)]
+model_bounds['cohen_avoid3'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30)]
+model_bounds['cohen_avoid4'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30)]
 model_bounds['cohen_avoid4_thres'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30), (0, 0.1)]
 model_bounds['perpendicular_avoid'] = [(0, 50), (0.0001, 50)]
 model_bounds['perpendicular_avoid2'] = [(0, 50), (0.0001, 20)]
@@ -192,6 +195,18 @@ def error(x, simulator, trials, logfile, args):
             avoid = {'name': 'cohen_avoid',
              'b1': x[0], 'k1': x[1], 'c5': x[2], 'c6': x[3],
              'b2': x[4], 'k2': x[5], 'c7': x[6], 'c8': x[7]}
+        elif args.avoid_model == 'cohen_avoid2':
+            avoid = {'name': 'cohen_avoid2',
+             'b1': x[0], 'k1': x[1], 'c5': x[2], 'c6': x[3],
+             'b2': x[4], 'k2': x[5], 'c7': x[6], 'c8': x[7]}
+        elif args.avoid_model == 'cohen_avoid3':
+            avoid = {'name': 'cohen_avoid3',
+             'k1': x[0], 'c5': x[1], 'c6': x[2],
+             'k2': x[3], 'c7': x[4], 'c8': x[5]}
+        elif args.avoid_model == 'cohen_avoid4':
+            avoid = {'name': 'cohen_avoid4',
+             'k1': x[0], 'c5': x[1], 'c6': x[2],
+             'k2': x[3], 'c7': x[4], 'c8': x[5]}
         elif args.avoid_model == 'cohen_avoid4_thres':
             avoid = {'name': 'cohen_avoid4_thres',
              'k1': x[0], 'c5': x[1], 'c6': x[2],
