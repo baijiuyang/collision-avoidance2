@@ -245,9 +245,10 @@ def main():
         args = get_input_args()
     args.subject = [int(x) for x in args.subject]
     notes = 'na'
-    logfile = 'fitting_log_' + str(args.subject) + '_' + ymdhms() + '.txt'
     bounds = model_bounds[args.training_model]
     simulator, trials = build_simulator(args.experiment_name, args.subject)
+    subj = [i for i in set(simulator.data.info['subj_id']) if i not in args.subject]
+    logfile = 'fitting_log_' + ymdhms() + '_' + str(subj[0]) + '.txt'
     with open(logfile, 'a') as file:
         file.write(f'experiment_name: {args.experiment_name}\nsubject: {args.subject}\ntrials: {trials}\n'
             f'approach_experiment: {args.approach_experiment}\n'
