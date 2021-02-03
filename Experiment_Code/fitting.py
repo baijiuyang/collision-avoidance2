@@ -75,7 +75,7 @@ def create_cmd_args():
     parser = argparse.ArgumentParser(description='Arguments for model training.')
     parser.add_argument('--experiment_name')
     parser.add_argument('--approach_experiment')
-    parser.add_argument('--subject', type=int)
+    parser.add_argument('--subject', nargs='+')
     parser.add_argument('--t_start')
     parser.add_argument('--t_end')
     parser.add_argument('--ps')
@@ -93,7 +93,7 @@ def get_input_args():
     args = argparse.Namespace()
     args.experiment_name = input('Type experiment_name (Bai_movObst1):\n')
     arg.approach_experiment = input('Type approach_experiment (Bai_movObst1b):\n')
-    args.subject = int(input('Type subject number:\n'))
+    args.subject = [int(input('Type subject number:\n'))]
     args.t_start = input('Type t_start (obst_onset/match_order/obst_out):\n')
     args.t_end = input('Type t_end (obst_out/end):\n') 
     args.ps = input('Type preferred speed (subj/var0):\n') 
@@ -114,7 +114,7 @@ def Bai_movObst1(subject):
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
-        if ((data.info['subj_id'][i] == subject or subject == -1) and
+        if ((data.info['subj_id'][i] in subject or -1 in subject) and
             data.info['obst_speed'][i] != 0 and
             abs(data.info['obst_angle'][i]) != 180):
             trials.append(i)
@@ -133,7 +133,7 @@ def Fajen_steer1a(subject):
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
-        if ((data.info['subj_id'][i] == subject or subject == -1) and
+        if ((data.info['subj_id'][i] in subject or -1 in subject) and
             data.info['ps_trial'][i] and
             (i not in data.dump)):
             trials.append(i)
@@ -149,7 +149,7 @@ def Cohen_movObst1(subject):
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
-        if ((data.info['subj_id'][i] == subject or subject == -1) and
+        if ((data.info['subj_id'][i] in subject or -1 in subject) and
             data.info['obst_speed'][i] and
             data.info['ps_trial'][i] and
             (i not in data.dump)):
@@ -190,7 +190,10 @@ def error(x, simulator, trials, logfile, args):
         else:
             print('approach_model invalid')
     elif args.training_model_type == 'avo':
-        approach = approaches[args.approach_experiment][args.approach_model][args.method][args.subject]
+        if len(args.subject) == 1:
+            approach = approaches[args.approach_experiment][args.approach_model][args.method][args.subject[0]]
+        else:
+            approach = approaches[args.approach_experiment][args.approach_model][args.method][-1]
         if args.avoid_model == 'cohen_avoid':
             avoid = {'name': 'cohen_avoid',
              'b1': x[0], 'k1': x[1], 'c5': x[2], 'c6': x[3],
@@ -236,10 +239,12 @@ def error(x, simulator, trials, logfile, args):
     return err
 
 def main():
+    print()
     args = create_cmd_args()
     if not args:
         args = get_input_args()
-    notes = 'Excluded free-walk trials, excluded 180 trials'
+    args.subject = [int(x) for x in args.subject]
+    notes = 'na'
     logfile = 'fitting_log_' + str(args.subject) + '_' + ymdhms() + '.txt'
     bounds = model_bounds[args.training_model]
     simulator, trials = build_simulator(args.experiment_name, args.subject)
