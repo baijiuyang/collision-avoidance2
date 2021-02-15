@@ -91,20 +91,24 @@ def run_trial(i_trial, s0, d0, angle, recorded):
             moveTarget(models['pacePole'], v0, time_elapsed)
         # Is stage ended?
         if overTheLine(cur_pos, RAMP_DIST, i_trial):
-            goToStage('approch')
+            goToStage('approach')
         else:
             # Check subject lateral deviation
             if offCourse(cur_pos):
                 sounds['startover'].play()
                 reset_trial()
     # Obstacle appears
-    elif stage == 'approch':
+    elif stage == 'approach':
         if s0:
             if not models['goalPole'].getVisible():
                 models['goalPole'].visible(viz.ON)
                 models['pacePole'].visible(viz.OFF)
         # Trial end
-        if distance(cur_pos[0], cur_pos[2], p_goal[0], p_goal[2]) < 0.5:
+        end_dist = END_DIST
+        if not s0:
+            p_goal = HOME_POLE[(i_trial+1) % 2]
+            end_dist = 2
+        if distance(cur_pos[0], cur_pos[2], p_goal[0], p_goal[2]) < end_dist:
             # Write data to disk
             if recorded:
                 filename = os.path.abspath(os.path.join(OUTPUT_DIR, 'Approach_subj' + subject + '.csv'))
@@ -281,10 +285,10 @@ if __name__ == "__main__":
     # Set to True when ready to have the experiment write data
     DATA_COLLECT = True
     # If program should run practice trials
-    DO_PRACTICE = False
+    DO_PRACTICE = True
 
     # If program crashes, start trials here
-    START_ON_TRIAL = 0 if DO_PRACTICE else 4
+    START_ON_TRIAL = -3 if DO_PRACTICE else 1
     TOTAL_TRIALS = 130 # 2 (s0) * 2 (d0) * 6(angle) * 5(reps) + 10 (freewalk) 
 
     # Set output directory for writing data
@@ -305,7 +309,7 @@ if __name__ == "__main__":
     ROOM_ANGLE = math.atan(DIMENSION_X/DIMENSION_Z) # the anger (in radian) between the diagonal and the shorter edge of the room
     DIAGONAL_UNIT = [[-math.sin(ROOM_ANGLE), 0, -math.cos(ROOM_ANGLE)], [math.sin(ROOM_ANGLE), 0, math.cos(ROOM_ANGLE)]]
     RAMP_DIST = 3 # acceleration distance before obstacle appears
-    END_DIST = 0.5 # distance to the goal pole, within which the trial end.
+    END_DIST = 1 # distance to the goal pole, within which the trial end.
     PACE_DIST = 1 # distance between pacePole and subj (homePole)
     
     # Home and Orient Pole positions (x,z,y)
@@ -398,7 +402,7 @@ if __name__ == "__main__":
         conditions = [[float(x) for x in line.split(',')] for line in lines]
         
     # Define the trial, with which the experiment starts
-    ii = START_ON_TRIAL + 3 if START_ON_TRIAL else 0
+    ii = START_ON_TRIAL + 3
     
     # Initailize trial variables
     reset_trial()
