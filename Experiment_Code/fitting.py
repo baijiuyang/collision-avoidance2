@@ -121,21 +121,34 @@ def Bai_movObst1(subject):
     simulator = ODESimulator(data=data)
     return simulator, trials
 
-def Bai_movObst1b():
-    pass
+def Bai_movObst1b(subject):
+    file = os.path.abspath(os.path.join(os.getcwd(),
+                                        os.pardir,
+                                        'Raw_Data',
+                                        'Bai_movObst1b_data.pickle'))
+    with open(file, 'rb') as f:
+        data = pickle.load(f)
+    trials = []
+    for i in range(len(data.trajs)):
+        if ((data.info['subj_id'][i] in subject or -1 in subject) and
+            data.info['leader_s0'][i] != 0 and
+            i not in data.dump):
+            trials.append(i)
+    simulator = ODESimulator(data=data)
+    return simulator, trials
 
 def Fajen_steer1a(subject):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
-                                        'Fajen_steer_exp1a_data.pickle'))
+                                        'Fajen_steer1a_data.pickle'))
     with open(file, 'rb') as f:
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
         if ((data.info['subj_id'][i] in subject or -1 in subject) and
             data.info['ps_trial'][i] and
-            (i not in data.dump)):
+            i not in data.dump):
             trials.append(i)
     simulator = ODESimulator(data=data)
     return simulator, trials
@@ -144,15 +157,28 @@ def Cohen_movObst1(subject):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
-                                        'Cohen_movObst_exp1_data.pickle'))
+                                        'Cohen_movObst1_data.pickle'))
     with open(file, 'rb') as f:
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
         if ((data.info['subj_id'][i] in subject or -1 in subject) and
-            data.info['obst_speed'][i] and
-            data.info['ps_trial'][i] and
-            (i not in data.dump)):
+            i not in data.dump):
+            trials.append(i)
+    simulator = ODESimulator(data=data)
+    return simulator, trials
+
+def Cohen_movObst2(subject):
+    file = os.path.abspath(os.path.join(os.getcwd(),
+                                        os.pardir,
+                                        'Raw_Data',
+                                        'Cohen_movObst2_data.pickle'))
+    with open(file, 'rb') as f:
+        data = pickle.load(f)
+    trials = []
+    for i in range(len(data.trajs)):
+        if ((data.info['subj_id'][i] in subject or -1 in subject) and
+            i not in data.dump):
             trials.append(i)
     simulator = ODESimulator(data=data)
     return simulator, trials
@@ -164,6 +190,8 @@ def build_simulator(experiment_name, subject):
         return Bai_movObst1b(subject)
     elif experiment_name == 'Cohen_movObst1':
         return Cohen_movObst1(subject)
+    elif experiment_name == 'Cohen_movObst2':
+        return Cohen_movObst2(subject)
     elif experiment_name == 'Fajen_steer1a':
         return Fajen_steer1a(subject)
     else:
