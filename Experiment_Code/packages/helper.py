@@ -57,6 +57,16 @@ def d_dist(p0, p1, v0, v1):
 
 
 def traj_velocity(traj, Hz):
+    '''
+    Convert a time series of xy positions to time series of velocities.
+    
+    Args:
+        traj: time series of xy positions.
+        Hz: Recording frequency.
+    
+    Return:
+        Time series of velocities.
+    '''
     return gradient(traj, axis=0) * Hz
     
 def traj_speed(traj, Hz):
@@ -129,17 +139,18 @@ def sp2v(s, phi, ref=[0, 1]):
     
 def v2sp(v, ref=[0, 1]):
     '''
-    Convert velocities to speeds and phi. 
+    Convert velocities to speeds and phi (headings). 
     
     Args:
         v (2-d vector or np array of 2-d vectors): Velocities.
-        ref (2-d vector): The allocentric reference axis that defines phi.
+        ref (2-d vector): The allocentric reference axis that defines phi==0.
             Clockwise rotation up to pi is positive, counter-clockwise rotation
             up to pi is negative. [0, 1] or [1, 0].
         
     Return:
         s, phi(floats or np array of floats): Speeds, and headings.
     '''
+    # Normalize reference
     ref = [i / norm(ref) for i in ref]
     def _v2sp(v, ref):
         s = norm(v)
@@ -155,13 +166,15 @@ def v2sp(v, ref=[0, 1]):
     if len(np.shape(v)) == 1:
         return _v2sp(v, ref)
     else:
-        v_shape = np.shape(v)
-        v = np.reshape(v, (int(np.size(v)/2), 2))
+#         v_shape = np.shape(v)
+#         v = np.reshape(v, (int(np.size(v)/2), 2))
+        # Preallocation
         ss = np.zeros(len(v))
         phis = np.zeros(len(v))
         for i in range(len(v)):
             ss[i], phis[i] = _v2sp(v[i], ref)
-        return np.reshape(ss, v_shape[:-1]), np.reshape(phis, v_shape[:-1])
+        return ss, phis
+#         return np.reshape(ss, v_shape[:-1]), np.reshape(phis, v_shape[:-1])
 
 def sp2a(s, d_s, phi, d_phi, ref=[0, 1]):
     '''
