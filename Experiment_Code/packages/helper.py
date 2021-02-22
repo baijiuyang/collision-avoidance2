@@ -152,9 +152,11 @@ def v2sp(v, ref=[0, 1]):
     '''
     # Normalize reference
     ref = [i / norm(ref) for i in ref]
+    
     def _v2sp(v, ref):
         s = norm(v)
         if s == 0:
+            # No speed no heading
             phi = None
         else:
             phi = arccos(inner(v, ref) / s)
@@ -163,18 +165,17 @@ def v2sp(v, ref=[0, 1]):
                 phi = -phi
         return s, phi
         
+    # For one velocity    
     if len(np.shape(v)) == 1:
         return _v2sp(v, ref)
+    # For a time series of velocities
     else:
-#         v_shape = np.shape(v)
-#         v = np.reshape(v, (int(np.size(v)/2), 2))
-        # Preallocation
+        # Pre-allocation of output variables
         ss = np.zeros(len(v))
         phis = np.zeros(len(v))
         for i in range(len(v)):
             ss[i], phis[i] = _v2sp(v[i], ref)
         return ss, phis
-#         return np.reshape(ss, v_shape[:-1]), np.reshape(phis, v_shape[:-1])
 
 def sp2a(s, d_s, phi, d_phi, ref=[0, 1]):
     '''
