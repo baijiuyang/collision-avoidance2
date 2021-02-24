@@ -297,7 +297,7 @@ class ODESimulator:
         else:
             trajs = [self.p_pred[i_trial], self.p_goal[i_trial], self.p_obst[i_trial]]
 
-        play_trajs(trajs, ws, self.Hz, ref=self.ref, title=title, labels=labels, colors=colors, interval=interval, save=save)
+        return play_trajs(trajs, ws, self.Hz, ref=self.ref, title=title, labels=labels, colors=colors, interval=interval, save=save)
 
     def test(self, metric, i_trial=None, all_errors=False):
         '''
