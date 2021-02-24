@@ -185,7 +185,7 @@ class ODESimulator:
         sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0, method='BDF', t_eval=t_eval, args=[self.models, self.args])
         xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = sol.y
         if len(x) != len(t_eval):
-            print("simulation ended early, switch to Euler method")
+            print(f'simulation ended early on trial {i_trial}, switch to Euler method')
             t_eval2 = t_eval[ : len(t_eval)-len(x)]
             var0 = [xg[-1], yg[-1], xo[-1], yo[-1], vxo[-1], vyo[-1], x[-1], y[-1], vx[-1], vy[-1], a[-1], phi[-1], s[-1], dphi[-1], ds[-1]]
             y2 = ODESimulator.odeEuler(self.ode_func, t_eval2, var0, args=[self.models, self.args])
