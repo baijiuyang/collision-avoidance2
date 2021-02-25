@@ -14,7 +14,7 @@ set subjs[12]=1 2 3 4 5 6 7 8 9 10 11 12 14 15
 set subjs[13]=1 2 3 4 5 6 7 8 9 10 11 12 13 15
 set subjs[14]=1 2 3 4 5 6 7 8 9 10 11 12 13 14
 
-FOR /L %%A IN (0, 1, 13) DO (
+FOR /L %%A IN (0, 1, 14) DO (
   start cmd /k^
  "call D:\Anaconda3\Scripts\activate.bat D:\Anaconda3"^
  "& activate avoidance"^

@@ -230,10 +230,9 @@ class ODESimulator:
                 for model in self.models:                        
                     # Use trial preferred speed
                     model['ps'] = self.data.info['ps_trial'][i]
-            if t_start == 'stimuli_onset':
-                t0 = self.data.info['stimuli_onset'][i]
-            elif t_start == 'match_order':
-                t0, t1 = self.data.info['stimuli_onset'][i], self.data.info['stimuli_out'][i]
+            
+            if t_start == 'match_order':
+                t0, t1 = self.data.info[t_start][i], self.data.info[t_end][i]
                 for ti in range(t0, t1):
                     var0 = self.compute_var0(i, ti)
                     dvardt = self.ode_func(0, var0, self.models, self.args)
@@ -242,18 +241,9 @@ class ODESimulator:
                     if np.sign(pass_order) == np.sign(pred_order):
                         t0 = ti
                         break
-            elif t_start == 'obst_out':
-                t0 = self.data.info['stimuli_out'][i]
             else:
-                t0 = int(t_start) * self.Hz
-
-            if t_end == 'obst_out':
-                t1 = self.data.info['stimuli_out'][i]
-            elif t_end == 'end':
-                t1 = len(self.data.trajs[i]) - 1
-            else:
-                t1 = len(self.data.trajs[i]) - abs(int(t_end)) * self.Hz
-
+                t0 = self.data.info[t_start][i]
+            t1 = self.data.info[t_end][i]
             self.t0[i], self.t1[i] = t0, t1
             self.var0[i] = self.compute_var0(i, t0)
             

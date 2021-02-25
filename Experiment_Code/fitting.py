@@ -116,7 +116,8 @@ def Bai_movObst1(subject):
     for i in range(len(data.trajs)):
         if ((data.info['subj_id'][i] in subject or -1 in subject) and
             data.info['obst_speed'][i] != 0 and
-            abs(data.info['obst_angle'][i]) != 180):
+            abs(data.info['obst_angle'][i]) != 180 and
+            i not in data.dump):
             trials.append(i)
     simulator = ODESimulator(data=data)
     return simulator, trials
@@ -195,7 +196,7 @@ def build_simulator(experiment_name, subject):
     elif experiment_name == 'Fajen_steer1a':
         return Fajen_steer1a(subject)
     else:
-        print('experiment_name invalid')
+        raise Exception('experiment_name invalid')
 
 def error(x, simulator, trials, logfile, args):
     global i_iter
@@ -214,7 +215,7 @@ def error(x, simulator, trials, logfile, args):
                  'k': x[0]}]
         elif args.approach_model == 'jerk_approach':
             simulator.models = [{'name': 'jerk_approach',
-                 'k': x[0], 'b': x[1]}]         
+                 'k': x[0], 'b': x[1]}]
         else:
             print('approach_model invalid')
     elif args.training_model_type == 'avo':
