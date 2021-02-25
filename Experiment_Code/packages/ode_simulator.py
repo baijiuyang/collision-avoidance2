@@ -16,6 +16,8 @@ from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_
                             cohen_avoid3, cohen_avoid4, acceleration_approach, \
                             perpendicular_avoid, cohen_avoid4_thres, perpendicular_avoid2
 
+def low_speed_event(t, y, placeholder1, placeholder2): return norm(y[8:10]) - 0.1
+low_speed_event.terminal = True
 
 class ODESimulator:
     '''
@@ -181,8 +183,10 @@ class ODESimulator:
             # self.var0.append(var0)
         else:
             t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
-
-        sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0, method='BDF', t_eval=t_eval, args=[self.models, self.args])
+        
+        sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0,
+            method='BDF', t_eval=t_eval, args=[self.models, self.args],
+            events=low_speed_event)
         xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = sol.y
         if len(x) != len(t_eval):
             print(f'simulation ended early on trial {i_trial}, switch to Euler method')

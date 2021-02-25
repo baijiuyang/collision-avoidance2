@@ -3,11 +3,12 @@ This module contains the code for model fitting.
 '''
 import os
 import sys
+import time
 import argparse
 import numpy as np
 from scipy import optimize
 import pickle
-from packages.helper import ymdhms, d_psi, beta, min_dist
+from packages.helper import ymdhms, hms, d_psi, beta, min_dist
 from packages.ode_simulator import ODESimulator
 from packages import data_container
 sys.modules['data_container'] = data_container
@@ -203,6 +204,7 @@ def error(x, simulator, trials, logfile, args):
     i_iter += 1
     print(f'iter {i_iter:03d}, subj{args.subject}, {args.training_model}, '
         f'x = ', [f'{a:0.3f}' for a in x])
+    tic = time.perf_counter()
     if args.training_model_type == 'app':
         if args.approach_model == 'fajen_approach':
             simulator.models = [{'name': 'fajen_approach',
@@ -261,14 +263,14 @@ def error(x, simulator, trials, logfile, args):
     else:
         accuracy = None
     print(f'error is {err:.6f}, accuracy is {accuracy}')
+    toc = time.perf_counter()
     with open(logfile, 'a') as file:
-        log = [str(x) for x in [i_iter, simulator.models, err, 'order_accuracy', accuracy]]
+        log = [str(x) for x in [i_iter, simulator.models, err, 'order_accuracy', accuracy, hms(toc-tic)]]
         file.write('\t'.join(log) + '\n')
     simulator.reset()
     return err
 
 def main():
-    print()
     args = create_cmd_args()
     if not args:
         args = get_input_args()
