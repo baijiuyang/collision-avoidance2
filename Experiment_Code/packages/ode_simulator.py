@@ -18,6 +18,7 @@ from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_
 
 def low_speed_event(t, y, placeholder1, placeholder2): return norm(y[8:10]) - 0.1
 low_speed_event.terminal = True
+low_speed_event.direction = -1
 
 class ODESimulator:
     '''
