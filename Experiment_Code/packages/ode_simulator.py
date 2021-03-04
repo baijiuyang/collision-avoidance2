@@ -157,10 +157,10 @@ class ODESimulator:
             elif model['name'] == 'perpendicular_avoid2':
                 for key, val in perpendicular_avoid2(model, beta_o, psi_o, theta_o, d_theta_o, d_psi_o, ref).items():
                     output[key] += val
-        for key, value in output.items():
-            if abs(value) > 100:
-                print(f'Large {key} = {value} encountered. Clip value between [-100, 100]')
-                output[key] = np.sign(value) * 100
+        # for key, value in output.items():
+            # if abs(value) > 100:
+                # print(f'Large {key} = {value} encountered. Clip value between [-100, 100]')
+                # output[key] = np.sign(value) * 100
         if 'ds' in output:
             ddphi, ds = output['ddphi'], output['ds']
             dds = da = 0
@@ -188,10 +188,9 @@ class ODESimulator:
             # self.var0.append(var0)
         else:
             t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
-        
         sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0,
-            method='BDF', t_eval=t_eval, args=[self.models, self.args],
-            events=low_speed_event)
+            method='LSODA', t_eval=t_eval, args=[self.models, self.args],
+            events=None, atol=1e-3, rtol=1e-2)
         xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = sol.y
         if len(x) != len(t_eval):
             print(f'simulation ended early on trial {i_trial}, switch to Euler method')
