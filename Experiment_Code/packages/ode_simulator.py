@@ -188,10 +188,15 @@ class ODESimulator:
             # self.var0.append(var0)
         else:
             t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
-        sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0,
-            method='LSODA', t_eval=t_eval, args=[self.models, self.args],
-            events=low_speed_event, atol=1e-3, rtol=1e-2)
-        xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = sol.y
+        try:
+            sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0,
+                method='LSODA', t_eval=t_eval, args=[self.models, self.args],
+                events=low_speed_event, atol=1e-3, rtol=1e-2)
+            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = sol.y
+        except:
+            print('solve_ivp crashed. Switch to Euler method')
+            sol = ODESimulator.odeEuler(self.ode_func, t_eval, var0, args=[self.models, self.args])
+            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = np.transpose(sol)
         if len(x) != len(t_eval):
             print(f'simulation ended early on trial {i_trial}, switch to Euler method')
             t_eval2 = t_eval[ : len(t_eval)-len(x)]
