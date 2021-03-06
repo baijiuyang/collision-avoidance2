@@ -76,7 +76,7 @@ def create_cmd_args():
     parser = argparse.ArgumentParser(description='Arguments for model training.')
     parser.add_argument('--experiment_name')
     parser.add_argument('--approach_experiment')
-    parser.add_argument('--subject', nargs='+')
+    parser.add_argument('--subject')
     parser.add_argument('--t_start')
     parser.add_argument('--t_end')
     parser.add_argument('--ps')
@@ -89,12 +89,12 @@ def create_cmd_args():
         return False
     args.training_model_type = args.training_model.split('_')[1][:3]
     return args
-    
+
 def get_input_args():
     args = argparse.Namespace()
     args.experiment_name = input('Type experiment_name (Bai_movObst1):\n')
     arg.approach_experiment = input('Type approach_experiment (Bai_movObst1b):\n')
-    args.subject = [int(input('Type subject number:\n'))]
+    args.subject = int(input('Type subject number:\n'))
     args.t_start = input('Type t_start (obst_onset/match_order/obst_out):\n')
     args.t_end = input('Type t_end (obst_out/end):\n') 
     args.ps = input('Type preferred speed (subj/var0):\n') 
@@ -106,7 +106,7 @@ def get_input_args():
     args.training_model_type = args.training_model.split('_')[1][:3]
     return args
 
-def Bai_movObst1(subject):
+def Bai_movObst1(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -115,7 +115,7 @@ def Bai_movObst1(subject):
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
-        if ((data.info['subj_id'][i] in subject or -1 in subject) and
+        if (data.info['subj_id'][i] in subjects and
             data.info['obst_speed'][i] != 0 and
             abs(data.info['obst_angle'][i]) != 180 and
             i not in data.dump):
@@ -123,7 +123,7 @@ def Bai_movObst1(subject):
     simulator = ODESimulator(data=data)
     return simulator, trials
 
-def Bai_movObst1b(subject):
+def Bai_movObst1b(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -132,14 +132,14 @@ def Bai_movObst1b(subject):
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
-        if ((data.info['subj_id'][i] in subject or -1 in subject) and
+        if (data.info['subj_id'][i] in subjects and
             data.info['leader_s0'][i] != 0 and
             i not in data.dump):
             trials.append(i)
     simulator = ODESimulator(data=data)
     return simulator, trials
 
-def Fajen_steer1a(subject):
+def Fajen_steer1a(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -148,14 +148,14 @@ def Fajen_steer1a(subject):
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
-        if ((data.info['subj_id'][i] in subject or -1 in subject) and
+        if (data.info['subj_id'][i] in subjects and
             data.info['ps_trial'][i] and
             i not in data.dump):
             trials.append(i)
     simulator = ODESimulator(data=data)
     return simulator, trials
     
-def Cohen_movObst1(subject):
+def Cohen_movObst1(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -164,13 +164,13 @@ def Cohen_movObst1(subject):
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
-        if ((data.info['subj_id'][i] in subject or -1 in subject) and
+        if (data.info['subj_id'][i] in subjects and
             i not in data.dump):
             trials.append(i)
     simulator = ODESimulator(data=data)
     return simulator, trials
 
-def Cohen_movObst2(subject):
+def Cohen_movObst2(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -179,23 +179,23 @@ def Cohen_movObst2(subject):
         data = pickle.load(f)
     trials = []
     for i in range(len(data.trajs)):
-        if ((data.info['subj_id'][i] in subject or -1 in subject) and
+        if ((data.info['subj_id'][i] in subjects) and
             i not in data.dump):
             trials.append(i)
     simulator = ODESimulator(data=data)
     return simulator, trials
 
-def build_simulator(experiment_name, subject):
+def build_simulator(experiment_name, subjects):
     if experiment_name == 'Bai_movObst1':
-        return Bai_movObst1(subject)
+        return Bai_movObst1(subjects)
     elif experiment_name == 'Bai_movObst1b':
-        return Bai_movObst1b(subject)
+        return Bai_movObst1b(subjects)
     elif experiment_name == 'Cohen_movObst1':
-        return Cohen_movObst1(subject)
+        return Cohen_movObst1(subjects)
     elif experiment_name == 'Cohen_movObst2':
-        return Cohen_movObst2(subject)
+        return Cohen_movObst2(subjects)
     elif experiment_name == 'Fajen_steer1a':
-        return Fajen_steer1a(subject)
+        return Fajen_steer1a(subjects)
     else:
         raise Exception('experiment_name invalid')
 
@@ -221,10 +221,10 @@ def error(x, simulator, trials, logfile, args):
         else:
             print('approach_model invalid')
     elif args.training_model_type == 'avo':
-        if len(args.subject) == 1:
-            approach = approaches[args.approach_experiment][args.approach_model][args.method][args.subject[0]]
-        else:
+        if args.subject == 'all' or args.subject[0] == '-':
             approach = approaches[args.approach_experiment][args.approach_model][args.method][-1]
+        else:
+            approach = approaches[args.approach_experiment][args.approach_model][args.method][int(args.subject)]            
         if args.avoid_model == 'cohen_avoid':
             avoid = {'name': 'cohen_avoid',
              'b1': x[0], 'k1': x[1], 'c5': x[2], 'c6': x[3],
@@ -274,12 +274,20 @@ def main():
     args = create_cmd_args()
     if not args:
         args = get_input_args()
-    args.subject = [int(x) for x in args.subject]
+    # Select subjects for fitting
+    if args.subject == 'all':
+        # Fit model to all subjects
+        subjects = range(100)
+    elif args.subject[0] == '-':
+        # For leave-one-subject-out cross validation
+        subjects = [int(x) for x in range(100) if x != -int(args.subject)]
+    else:
+        # For single subject fitting
+        subjects = [int(args.subject)]
     notes = 'na'
     bounds = model_bounds[args.training_model]
-    simulator, trials = build_simulator(args.experiment_name, args.subject)
-    subj = [i for i in set(simulator.data.info['subj_id']) if i not in args.subject]
-    logfile = 'fitting_log_' + ymdhms() + '_' + str(subj[0]) + '.txt'
+    simulator, trials = build_simulator(args.experiment_name, subjects)
+    logfile = 'fitting_log_' + ymdhms() + '_' + str(args.subject) + '.txt'
     with open(logfile, 'a') as file:
         file.write(f'experiment_name: {args.experiment_name}\nsubject: {args.subject}\ntrials: {trials}\n'
             f'approach_experiment: {args.approach_experiment}\n'
@@ -296,7 +304,8 @@ def main():
         res = optimize.dual_annealing(error, bounds, args=(simulator, trials, logfile, args),
                                       initial_temp=25000)
     elif args.method == 'differential_evolution':
-        res = optimize.differential_evolution(error, bounds, args=(simulator, trials, logfile, args))
+        res = optimize.differential_evolution(error, bounds, args=(simulator, trials, logfile, args),
+                                    updating='immediate', workers=1)
     elif args.method == 'basinhopping':
         res = optimize.basinhopping(error, bounds, minimizer_kwargs={'args':(simulator, trials, logfile, args)})
     with open(logfile, 'a') as file:
