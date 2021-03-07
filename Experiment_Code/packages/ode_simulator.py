@@ -346,10 +346,12 @@ class ODESimulator:
                 vals.append(np.mean(dist(trues[i], preds[i])))
             elif alg == 'MAE':
                 vals.append(mean_absolute_error(trues[i], preds[i]))
-            elif alg == 'MSE':
+            elif alg == 'MSE' or alg == 'RMSE':
                 vals.append(mean_squared_error(trues[i], preds[i]))
-            elif alg == 'RMSE':
-                vals.append(np.sqrt(mean_squared_error(trues[i], preds[i])))  
         if all_errors:
+            if alg == 'RMSE':
+                print('Return values are Mean Squared Errors. Please take the mean of them and then take the square root to get RMSE')
             return vals
-        return np.mean(vals)    
+        if alg == 'RMSE':
+            return np.sqrt(np.mean(vals))
+        return np.mean(vals)
