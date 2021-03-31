@@ -302,7 +302,7 @@ class ODESimulator:
 
         return play_trajs(trajs, ws, self.Hz, ref=self.ref, title=title, labels=labels, colors=colors, interval=interval, save=save)
 
-    def test(self, metric, i_trial=None, all_errors=False):
+    def test(self, metric, i_trials=None, all_errors=False):
         '''
         Metric has the format of "var_alg". "var" can be 'p': position,
         'v': velocity, 'a': acceleration, 's': speed, 'phi': heading, or
@@ -333,9 +333,9 @@ class ODESimulator:
         elif var == 'order':
             preds = self.pass_order_pred
             trues = np.array(self.data.info['pass_order'])[self.i_trials]
-        if i_trial:
-            trues = trues[i_trial]
-            preds = preds[i_trial]
+        if i_trials:
+            trues = [x for i, x in enumerate(trues) if i in i_trials]
+            preds = [x for i, x in enumerate(preds) if i in i_trials]
             
         # Compute metric
         if alg == 'accuracy':
