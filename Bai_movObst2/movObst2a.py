@@ -1,5 +1,5 @@
 '''
-Created by Jiuyang Bai on 07/21/2020
+Created by Jiuyang Bai on 03/31/2021
 baijiuyang@hotmail.com
 This is an experiment on moving obstacle avoidance, in which
 A moving obstacle intercepts participant from different angle
@@ -18,10 +18,12 @@ def masterLoop(num):
         recorded = False
     else:
         recorded = True
-    run_trial(int(conditions[ii][0]), conditions[ii][1], conditions[ii][2], recorded)
+    run_trial(int(conditions[ii][0]), conditions[ii][1], conditions[ii][2],
+        float(conditions[ii][3]), int(conditions[ii][4]), recorded)
     
-def run_trial(i_trial, angle, speed, recorded):
-    global trial_time, alpha, print_flag, ii, timer_on, obst_v, data_buffer, recording
+def run_trial(i_trial, angle, speed, dsize, ipd, recorded):
+    global trial_time, alpha, print_flag, ii, timer_on, obst_v, data_buffer, recording, \
+        hmd, IPD
     time_elapsed = viz.getFrameElapsed()
     trial_time += time_elapsed
     # Current position and roation of the participant
@@ -29,6 +31,7 @@ def run_trial(i_trial, angle, speed, recorded):
     cur_rot = viz.get(viz.HEAD_ORI)
     # Pops up the Emergency Walls when participant is close to physical room edge.
     popWalls(cur_pos)
+    
     
     # Record data to buffer
     if recorded and recording:
@@ -56,6 +59,10 @@ def run_trial(i_trial, angle, speed, recorded):
             if recorded:
                 data_buffer += '\n' + 'trial,' + str(i_trial).zfill(3) + ',angle,' + str(angle) + ',speed,' + str(speed) + '\n'
                 data_buffer += 'timeStamp,subjX,subjY,subjZ,subjYaw,subjPitch,subjRow,' + 'obstX,obstZ,goalX,goalZ\n'
+            if ipd:
+                hmd.setIPD(IPD)
+            else:
+                hmd.setIPD(0)
         if alpha < 1.0:
             models['homePole'].alpha(alpha)
             models['orientPole'].alpha(alpha)
@@ -89,7 +96,8 @@ def run_trial(i_trial, angle, speed, recorded):
             if not models['obstPole'].getVisible():                           
                 models['obstPole'].visible(viz.ON)
             # Move obstPole
-            moveTarget(models['obstPole'], obst_v, time_elapsed)        
+            moveTarget(models['obstPole'], obst_v, time_elapsed)
+            changeSize(models['obstPole'], cur_pos, dsize, time_elapsed)
         # Trial end
         if overTheLine(cur_pos, -END_DIST, i_trial):
             # Write data to disk
@@ -184,6 +192,21 @@ def moveTarget(target, v, dt):
     p0 = target.getPosition()
     p1 = [xi + vi * dt for xi, vi in zip(p0, v)]
     target.setPosition(p1)
+
+def changeSize(target, cur_pos, dsize, dt):
+    '''
+    Change the size of an object on the y and z dimension while keeping
+    the x dimension constant and towards the subject. 
+    target (viz object): 3d model.
+    cur_pos ([x,y,z]): The current position of hmd.
+    dsize (float): The rate of change on size.
+    dt (float): Time elapsed in a frame.
+    '''
+    sx, sy, sz = target.getScale()
+    target.setScale([sx , sy + sy * dsize * dt, sz + sz * dsize * dt])
+    # Keep the z axis of the target facing the subject
+    target.lookAt(cur_pos)
+    
 
 def relativeOrientation(pos1, pos2):
 	xrel = round(pos2[0]-pos1[0],4)
@@ -356,7 +379,10 @@ if __name__ == "__main__":
         HZ = 90
         # viz.fullscreen.x is the inital x position when run	
         # add Odyssey tracker
-        ODTracker = steamvr.HMD().getSensor()
+        hmd = steamvr.HMD()
+        IPD = hmd.getIPD()
+        hmd.setIPD(0)
+        ODTracker = hmd.getSensor()
         # add the virtual tracker, link it to the MainView and set an offset to get the eye position
         link = viz.link(ODTracker, viz.MainView)
     viz.clip(.001,1000) # Adjust size of the viewing frustum
