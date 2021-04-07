@@ -40,17 +40,25 @@ def create_trial_list(IVs, rep, n_freewalk):
     
 if __name__ == "__main__":
     # Prepare trial list
-    n_subject = 1
+    subjects = range(15)
     IVs = {'angle': [157.5, 112.5, -157.5, -112.5], 'speed': [0.9, 1.1],
         'dsize': [-0.1, 0, 0.1], 'ipd': [1, 0]}
     rep = 3
     n_freewalk = 10
-    practice_trials = create_trial_list({'angle': [157.5, -112.5], 'speed': [1.0],
+    practice_trials_no_disparity = create_trial_list({'angle': [157.5, -112.5], 'speed': [1.0],
         'dsize': [0], 'ipd': [0]}, 1, 2)
-    n_practice_trials = len(practice_trials)
-    for subj in range(n_subject):
-        test_trials = create_trial_list(IVs, rep, n_freewalk)
-        trials = practice_trials + test_trials
+    practice_trials_with_disparity = create_trial_list({'angle': [157.5, -112.5], 'speed': [1.0],
+        'dsize': [0], 'ipd': [1]}, 1, 2)
+    n_practice_trials = len(practice_trials_no_disparity)
+    for subj in subjects:
+        IVs['ipd'] = [0]
+        no_disparity_trials = create_trial_list(IVs, rep, n_freewalk//2)
+        IVs['ipd'] = [1]
+        disparity_trials = create_trial_list(IVs, rep, n_freewalk//2)
+        if subj < 7:
+            trials = practice_trials_no_disparity + no_disparity_trials + disparity_trials
+        else:
+            trials = practice_trials_with_disparity + disparity_trials + no_disparity_trials
         header = ['i_trial'] + list(IVs.keys())
         with open('Subj' + str(subj).zfill(2) + '.csv', 'a') as file:
             file.write(','.join(header) + '\n')
