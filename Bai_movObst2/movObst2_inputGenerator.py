@@ -15,7 +15,7 @@ def create_trial_list(IVs, rep, n_freewalk):
         n_freewalk (int): Number of freewalk trials.
     
     Return:
-        trial_list(list of dicts): Lists of trial configs in the form
+        trial_list(list of dicts): A list of trial configs in the form
             of {'var1': val1, 'var2': val2, ...}. All values are zero for
             freewalk trials.
     '''
@@ -39,28 +39,34 @@ def create_trial_list(IVs, rep, n_freewalk):
     return trial_list
     
 if __name__ == "__main__":
+    EXP = 'exp_a_'
+    IPD = 0.07
     # Prepare trial list
-    subjects = range(15)
+    subjects = range(13)
     IVs = {'angle': [157.5, 112.5, -157.5, -112.5], 'speed': [0.9, 1.1],
-        'dsize': [-0.1, 0, 0.1], 'ipd': [1, 0]}
+        'dw': [-0.1, 0, 0.1], 'ipd': [None]}
     rep = 3
     n_freewalk = 10
-    practice_trials_no_disparity = create_trial_list({'angle': [157.5, -112.5], 'speed': [1.0],
-        'dsize': [0], 'ipd': [0]}, 1, 2)
-    practice_trials_with_disparity = create_trial_list({'angle': [157.5, -112.5], 'speed': [1.0],
-        'dsize': [0], 'ipd': [1]}, 1, 2)
-    n_practice_trials = len(practice_trials_no_disparity)
+    practice_trials = create_trial_list({'angle': [157.5, -112.5], 'speed': [1.0],
+        'dw': [0], 'ipd': [0]}, 1, 2)
+    n_practice_trials = len(practice_trials)
     for subj in subjects:
-        IVs['ipd'] = [0]
         no_disparity_trials = create_trial_list(IVs, rep, n_freewalk//2)
-        IVs['ipd'] = [1]
+        for trial in no_disparity_trials:
+            trial['ipd'] = 0
         disparity_trials = create_trial_list(IVs, rep, n_freewalk//2)
-        if subj < 7:
-            trials = practice_trials_no_disparity + no_disparity_trials + disparity_trials
+        for trial in disparity_trials:
+            trial['ipd'] = IPD
+        if 1<= subj <= 3 or 7 <= subj <= 9:
+            for trial in practice_trials:
+                trial['ipd'] = 0
+            trials = practice_trials + no_disparity_trials + disparity_trials
         else:
-            trials = practice_trials_with_disparity + disparity_trials + no_disparity_trials
+            for trial in practice_trials:
+                trial['ipd'] = IPD
+            trials = practice_trials + disparity_trials + no_disparity_trials
         header = ['i_trial'] + list(IVs.keys())
-        with open('Subj' + str(subj).zfill(2) + '.csv', 'a') as file:
+        with open(EXP + 'subj' + str(subj).zfill(2) + '.csv', 'a') as file:
             file.write(','.join(header) + '\n')
             for i, trial in enumerate(trials):
                 cond = [str(i - n_practice_trials + 1)] + [str(x) for x in list(trial.values())]
