@@ -39,7 +39,7 @@ def create_trial_list(IVs, rep, n_freewalk):
     return trial_list
     
 if __name__ == "__main__":
-    EXP = 'exp_a_'
+    EXP = 'exp_b_'
     IPD = 0.07
     # Prepare trial list
     subjects = range(13)

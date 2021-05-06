@@ -1,9 +1,11 @@
 '''
-Created by Jiuyang Bai on 03/31/2021
+Created by Jiuyang Bai on 04/09/2021
 baijiuyang@hotmail.com
 This is an experiment on moving obstacle avoidance, in which
 A moving obstacle intercepts participant from different angle
-and at different speed.
+and at different speed. The differences from experitment A are:
+(1) There is no ground floor. (2) All poles have a huge
+vertical dimension to hide ground plane.
 '''
 import random
 import os.path
@@ -13,7 +15,6 @@ import viztracker
 import vizconnect
 import time
 import vizact
-eye_height = 0
 
 def masterLoop(num):
     if conditions[ii][0] < 1 or not DATA_COLLECT:
@@ -35,7 +36,6 @@ def run_trial(i_trial, angle, speed, dsize, ipd, recorded):
     popWalls(cur_pos)
     
 #    print(viz.MainWindow.getIPD())
-#    print(eye_height, models['obstPole'].getPosition()[1] + models['obstPole'].getScale()[1] * 3)
     # Record data to buffer
     if recorded and recording:
         obst = models['obstPole'].getPosition()
@@ -57,9 +57,13 @@ def run_trial(i_trial, angle, speed, dsize, ipd, recorded):
             obst_vi = rotate(DIAGONAL_UNIT[i_trial % 2], ang) # unit vector
             obst_p = [-i * dist for i in obst_vi]                
             obst_v = [vi * speed for vi in obst_vi]
+            # Randomize position_y
+            obst_p[1] = random.randint(-10, -3)
             models['obstPole'].setPosition(obst_p)
-            models['obstPole'].setScale([0.5,0.6,0.5])
+            models['obstPole'].setScale([0.5,1,0.5])
+            HOME_POLE[i_trial % 2][1] = random.randint(-10, -3)
             models['homePole'].setPosition(HOME_POLE[i_trial % 2])
+            ORI_POLE[i_trial % 2][1] = random.randint(-10, -3)
             models['orientPole'].setPosition(ORI_POLE[i_trial % 2])
             models['homePole'].visible(viz.ON)    
             models['orientPole'].visible(viz.ON)
@@ -110,7 +114,7 @@ def run_trial(i_trial, angle, speed, dsize, ipd, recorded):
         if overTheLine(cur_pos, -END_DIST, i_trial):
             # Write data to disk
             if recorded:
-                filename = os.path.abspath(os.path.join(OUTPUT_DIR, 'exp_a_Subj' + subject + '.csv'))
+                filename = os.path.abspath(os.path.join(OUTPUT_DIR, 'exp_b_Subj' + subject + '.csv'))
                 with open(filename, 'a') as file:
                     file.write(data_buffer)
             reset_trial()
@@ -198,7 +202,7 @@ def offCourse(cur_pos):
 def moveTarget(target, v, dt):
     # unit of spd is m/s
     p0 = target.getPosition()
-    p1 = [xi + vi * dt for xi, vi in zip(p0, v)]
+    p1 = [p0[0] + v[0] * dt, p0[1], p0[2] + v[2] * dt]
     target.setPosition(p1)
 
 def changeSize(target, center_y, cur_pos, dsize, dt):
@@ -288,7 +292,7 @@ def popWalls(pos):
 
 def overwriteIPD():
     viz.ipd(IPD)
-
+    
 if __name__ == "__main__":
     # Settings
     # Set to True when ready to have the experiment write data
@@ -323,8 +327,8 @@ if __name__ == "__main__":
     END_DIST = 2 # distance to the next home pole, within which the trial end.
     
     # Home and Orient Pole positions (x,z,y)
-    HOME_POLE = [[DIMENSION_X/2, 0.0, DIMENSION_Z/2], [-DIMENSION_X/2, 0.0, -DIMENSION_Z/2]]
-    ORI_POLE = [[-DIMENSION_X, 0.0, -DIMENSION_Z], [DIMENSION_X, 0.0, DIMENSION_Z]]
+    HOME_POLE = [[DIMENSION_X/2, 0, DIMENSION_Z/2], [-DIMENSION_X/2, 0, -DIMENSION_Z/2]]
+    ORI_POLE = [[-DIMENSION_X, 0, -DIMENSION_Z], [DIMENSION_X, 0, DIMENSION_Z]]
     
     # Emergency wall
     wall = []
@@ -342,15 +346,17 @@ if __name__ == "__main__":
     # Load stimuli. Original pole size [0.4, 3, 0.4]
     viz.clearcolor(0,0.4,1.0) # blue world
     models = {}
-    models['homePole'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'pole_blue.osgb')))
-    models['orientPole'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'pole_yellow.osgb')))
-    models['goalPole'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'pole_green.osgb')))
-    models['obstPole'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'pole_red_3-3.osgb')))  
-    models['ground'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'ground.osgb')))  
+    models['homePole'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'pole_blue_96-0.osgb')))
+    models['orientPole'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'pole_yellow_96-0.osgb')))
+    models['goalPole'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'pole_green_96-0.osgb')))
+    models['obstPole'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'pole_red_96-0.osgb')))  
+    # models['ground'] = viz.add(os.path.abspath(os.path.join(MODEL_DIR, 'ground.osgb')))  
     
     # Adjust models size turn visible off
-    models['homePole'].setScale([0.6,0.45,0.6])
-    models['obstPole'].setScale([0.5,0.6,0.5])
+    models['homePole'].setScale([0.6,1,0.6])
+    models['orientPole'].setScale([1,1,1])
+    models['goalPole'].setScale([1,1,1])
+    models['obstPole'].setScale([0.5,1,0.5])
     models['homePole'].visible(viz.OFF)
     models['orientPole'].visible(viz.OFF)
     models['goalPole'].visible(viz.OFF)
@@ -381,7 +387,7 @@ if __name__ == "__main__":
 
     subject = viz.input('Please enter the subject number:','')
     subject = str(subject).zfill(2)
-    
+
     # Use keyboard controls
     # Controls:
     # q - Strafe L		w - Forward		e - Strafe R
@@ -408,7 +414,7 @@ if __name__ == "__main__":
     viz.clip(.001,1000)
     
     # loads experimental conditions
-    inputFile = os.path.abspath(os.path.join(INPUT_DIR, 'exp_a_subj' + subject + '.csv'))
+    inputFile = os.path.abspath(os.path.join(INPUT_DIR, 'exp_b_subj' + subject + '.csv'))
     
     with open(inputFile, 'r') as file:
         lines = file.read().split('\n')[1:-1]
