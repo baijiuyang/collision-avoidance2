@@ -313,7 +313,7 @@ if __name__ == "__main__":
     POLE_TRIGGER_RADIUS = 0.3 # How close participant must be to home pole
     THRESHOLD_THETA = 10 # Maximum angle participant can deviate when looking at orienting pole
     ORIENT_TIME = 3 # How long participant must orient onto pole
-    COURSE_MARGIN = 0.2 # off-course threshold
+    COURSE_MARGIN = 0.3 # off-course threshold
     # The dimension of the room space used for experiment
     DIMENSION_X, DIMENSION_Z = 9.0, 11.0
     DIAGONAL = (DIMENSION_X**2 + DIMENSION_Z**2)**(1.0/2)# The length of the diagonal line of the experimental space

@@ -42,7 +42,7 @@ if __name__ == "__main__":
     EXP = 'exp_b_'
     IPD = 0.07
     # Prepare trial list
-    subjects = range(13)
+    subjects = [1]
     IVs = {'angle': [157.5, 112.5, -157.5, -112.5], 'speed': [0.9, 1.1],
         'dw': [-0.1, 0, 0.1], 'ipd': [None]}
     rep = 3

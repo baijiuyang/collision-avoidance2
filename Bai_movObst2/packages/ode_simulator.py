@@ -51,6 +51,7 @@ class ODESimulator:
     
     def reset(self):
         self.i_trials = []
+        self.w_obst = []
         self.p_pred = []
         self.p_subj = []
         self.p_obst = []
@@ -83,7 +84,12 @@ class ODESimulator:
         v_post = self.data.info['v_subj'][i][t0+1]
         _, dphi0 = va2dsdp([vx0, vy0], [ax, ay])
         ds0 = (norm(v_post) - norm(v_pre)) / 2 * self.Hz
-        return xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, a0, phi0, s0, dphi0, ds0
+        if 'w' in self.data.info:
+            w0 = self.data.info['w'][i][t0]
+        else:
+            w0 = self.self.data.info['w_obst']
+        var0 = (xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, a0, phi0, s0, dphi0, ds0, w0)
+        return var0
 
     @staticmethod
     def odeEuler(f, t, y0, args=None):
@@ -107,21 +113,30 @@ class ODESimulator:
         y = np.zeros((len(t), len(y0)))
         y[0] = y0
         for n in range(0,len(t)-1):
-            y[n+1] = y[n] + np.array(f(t[n], y[n], args[0], args[1])) * (t[n+1] - t[n])
+            y[n+1] = y[n] + np.array(f(t[n], y[n], args[0], args[1], args[2])) * (t[n+1] - t[n])
         return y
         
-    def ode_func(self, t, var, models, args):
-        xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = var
-        ref, w_goal, w_obst = self.ref, args['w_goal'], args['w_obst']
+    def ode_func(self, t, var, models, args, i_trial):
+        if self.data:
+            dw = self.data.info['dw'][i_trial][int(self.t0[i_trial] + t * self.Hz)]
+        else:
+            if 'dw' not in self.args:
+                dw = 0
+            else:
+                if len(np.shape(self.args['dw'])) == 0:
+                    dw = self.args['dw']
+                else:
+                    dw = self.args['dw'][int(t * self.Hz)]
+        xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds, w_obst = var
+        ref, w_goal = self.ref, args['w_goal']
         r_g = dist([x, y], [xg, yg])
         r_o = dist([x, y], [xo, yo])
         psi_g = psi([x, y], [xg, yg], ref=ref)
         beta_o = beta([x, y], [xo, yo], [vx, vy])
         theta_o = theta([x, y], [xo, yo], w_obst)
         psi_o = psi([x, y], [xo, yo], ref=ref)
-        d_theta_o = d_theta([x, y], [xo, yo], [vx, vy], [vxo, vyo], w_obst)
+        d_theta_o = d_theta([x, y], [xo, yo], [vx, vy], [vxo, vyo], w_obst, dw)
         d_psi_o = d_psi([x, y], [xo, yo], [vx, vy], [vxo, vyo])
-        
         output = defaultdict(float)
         for model in models:
             if model['name'] == 'fajen_approach':
@@ -175,7 +190,7 @@ class ODESimulator:
             ddphi = dds = da = 0
         elif 'da' in output:
             pass
-        dvardt = [0, 0, vxo, vyo, 0, 0, vx, vy, ax, ay, da, dphi, ds, ddphi, dds]
+        dvardt = [0, 0, vxo, vyo, 0, 0, vx, vy, ax, ay, da, dphi, ds, ddphi, dds, dw]
         return dvardt
     
     def simulate(self, var0, t0=None, t1=None, total_time=None, i_trial=None, print_trial=False, print_time=True):
@@ -190,23 +205,24 @@ class ODESimulator:
             t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
         try:
             sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0,
-                method='LSODA', t_eval=t_eval, args=[self.models, self.args],
+                method='LSODA', t_eval=t_eval, args=[self.models, self.args, i_trial],
                 events=low_speed_event, atol=1e-3, rtol=1e-2)
-            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = sol.y
+            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds, w = sol.y
         except:
             print('solve_ivp crashed. Switch to Euler method')
-            sol = ODESimulator.odeEuler(self.ode_func, t_eval, var0, args=[self.models, self.args])
-            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = np.transpose(sol)
+            sol = ODESimulator.odeEuler(self.ode_func, t_eval, var0, args=[self.models, self.args, i_trial])
+            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds, w = np.transpose(sol)
         if len(x) != len(t_eval):
             print(f'simulation ended early on trial {i_trial}, switch to Euler method')
             t_eval2 = t_eval[ : len(t_eval)-len(x)]
-            var0 = [xg[-1], yg[-1], xo[-1], yo[-1], vxo[-1], vyo[-1], x[-1], y[-1], vx[-1], vy[-1], a[-1], phi[-1], s[-1], dphi[-1], ds[-1]]
-            y2 = ODESimulator.odeEuler(self.ode_func, t_eval2, var0, args=[self.models, self.args])
-            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds = np.concatenate((sol.y, np.transpose(y2)), axis=1)
+            var0 = [xg[-1], yg[-1], xo[-1], yo[-1], vxo[-1], vyo[-1], x[-1], y[-1], vx[-1], vy[-1], a[-1], phi[-1], s[-1], dphi[-1], ds[-1], w[-1]]
+            y2 = ODESimulator.odeEuler(self.ode_func, t_eval2, var0, args=[self.models, self.args, i_trial])
+            xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds, w = np.concatenate((sol.y, np.transpose(y2)), axis=1)
         self.p_pred.append(np.stack((x, y), axis=-1))
         self.p_obst.append(np.stack((xo, yo), axis=-1))
         self.p_goal.append(np.stack((xg, yg), axis=-1))
         self.v_pred.append(np.stack((vx, vy), axis=-1))
+        self.w_obst.append(w)
         self.phi_pred.append(phi)
         self.s_pred.append(s)
         if self.data:
@@ -276,11 +292,11 @@ class ODESimulator:
             save (bool): Flag for saving the animation in the current working directory.
         '''
         # Trial index in data instead of simulation results (because some trials are skipped in simulation)
-        j_trial = self.i_trials[i_trial]
         w_goal, w_obst = self.args['w_goal'], self.args['w_obst']
         ws = [0.4, w_goal, w_obst]
         labels = ['pred', 'goal', 'obst']
         if self.data:
+            j_trial = self.i_trials[i_trial]
             if 'obst_speed' in self.data.info and 'obst_angle' in self.data.info and \
             (self.data.info['obst_speed'][j_trial] == 0 or abs(self.data.info['obst_angle'][j_trial]) == 180):
                 print('This trial is not simulated')

@@ -247,7 +247,7 @@ def theta(p0, p1, w):
     r = dist(p0, p1)
     return 2 * arctan(w / (2 * r))
     
-def d_theta(p0, p1, v0, v1, w):
+def d_theta(p0, p1, v0, v1, w, dw=0):
     '''
     Computes the analytical solution of optical expansion of p1 in the perspective
     of p0. This function assumes symmetrical expansion of p1. 
@@ -263,23 +263,25 @@ def d_theta(p0, p1, v0, v1, w):
         RE (float or np array of floats): An array of rate of optical expansion
             in radians / second.
     '''
-    def _d_theta(p0, p1, v0, v1, w):
+    def _d_theta(p0, p1, v0, v1, w, dw):
         r01 = [i - j for i, j in zip(p1, p0)] # Vector pointing to agent 1 from agent 0.
         r10 = [-i for i in r01]
         r = norm(r01) # Distance between agent 0 and agent 1.
         # The time derivative of distance is the sum of speed along the signed distance
         dr = (inner(v0, r01) + inner(v1, r10)) / r
-        RE = 1 * w * dr / (r ** 2 + w ** 2 / 4)
+        RE = (r * dw + w * dr) / (r ** 2 + w ** 2 / 4)
         return RE
         
     if len(np.shape(p0)) == 1:
-        return _d_theta(p0, p1, v0, v1, w)
+        return _d_theta(p0, p1, v0, v1, w, dw)
     else:
         if len(np.shape(w)) == 0:
             w = [w] * len(p0)
+        if len(np.shape(w)) == 0:
+            dw = [dw] * len(p0)
         REs = np.zeros(len(p0))
         for i in range(len(REs)):
-            REs[i] = _d_theta(p0[i], p1[i], v0[i], v1[i], w[i])
+            REs[i] = _d_theta(p0[i], p1[i], v0[i], v1[i], w[i], dw[i])
         return REs
 
 def d_theta_numeric(p0, p1, w, Hz):
