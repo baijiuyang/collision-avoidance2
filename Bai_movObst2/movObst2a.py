@@ -116,6 +116,10 @@ def run_trial(i_trial, angle, speed, dsize, ipd, recorded):
             reset_trial()
             if i_trial == TOTAL_TRIALS:
                 stage == 'NULL'
+                models['homePole'].setPosition(HOME_POLE[(i_trial+1) % 2])
+                models['homePole'].visible(viz.ON)
+                models['orientPole'].visible(viz.OFF)
+                models['goalPole'].visible(viz.OFF)
                 sounds['end'].play()
             else:
                 ii += 1
