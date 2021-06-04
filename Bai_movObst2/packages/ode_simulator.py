@@ -87,7 +87,7 @@ class ODESimulator:
         if 'w' in self.data.info:
             w0 = self.data.info['w'][i][t0]
         else:
-            w0 = self.self.data.info['w_obst']
+            w0 = self.data.info['w_obst']
         var0 = (xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, a0, phi0, s0, dphi0, ds0, w0)
         return var0
 
