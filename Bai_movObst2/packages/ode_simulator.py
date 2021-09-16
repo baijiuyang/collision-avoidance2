@@ -88,8 +88,10 @@ class ODESimulator:
         ds0 = (norm(v_post) - norm(v_pre)) / 2 * self.Hz
         if 'w' in self.data.info:
             w0 = self.data.info['w'][i][t0]
-        else:
+        elif 'w_obst' in self.data.info:
             w0 = self.data.info['w_obst']
+        else:
+            w0 = 0
         var0 = (xg0, yg0, xo0, yo0, vxo0, vyo0, x0, y0, vx0, vy0, a0, phi0, s0, dphi0, ds0, w0)
         return var0
 
@@ -120,7 +122,10 @@ class ODESimulator:
         
     def ode_func(self, t, var, models, args, i_trial):
         if self.data:
-            dw = self.data.info['dw'][i_trial][int(self.t0[i_trial] + t * self.Hz)]
+            if 'dw' in self.data.info:
+                dw = self.data.info['dw'][i_trial][int(self.t0[i_trial] + t * self.Hz)]
+            else:
+                dw = 0
         else:
             if 'dw' not in self.args:
                 dw = 0
@@ -206,9 +211,12 @@ class ODESimulator:
         else:
             t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
         try:
+            # sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0,
+                # method='LSODA', t_eval=t_eval, args=[self.models, self.args, i_trial],
+                # events=low_speed_event, atol=1e-3, rtol=1e-2)
             sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0,
                 method='LSODA', t_eval=t_eval, args=[self.models, self.args, i_trial],
-                events=low_speed_event, atol=1e-3, rtol=1e-2)
+                atol=1e-3, rtol=1e-2)
             xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds, w = sol.y
         except:
             print('solve_ivp crashed. Switch to Euler method')
@@ -276,7 +284,6 @@ class ODESimulator:
                 t0 = self.data.info[t_start][i]
             t1 = self.data.info[t_end][i]
             self.t0[i], self.t1[i] = t0, t1
-            print(i, t0)
             self.var0[i] = self.compute_var0(i, t0)
             
             if ps == 'var0':
