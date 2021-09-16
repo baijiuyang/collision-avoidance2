@@ -64,7 +64,9 @@ class ODESimulator:
     
     def use_data(self):
         self.Hz = self.data.Hz
-        self.args = {'w_goal': self.data.info['w_goal'], 'w_obst': self.data.info['w_obst']}
+        self.args = {'w_goal': self.data.info['w_goal']}
+        if 'w_obst' in self.data.info:
+            self.args['w_obst'] = self.data.info['w_obst']
         print(f'Loading finished')
         
     def compute_var0(self, i_trial, t0):
@@ -274,6 +276,7 @@ class ODESimulator:
                 t0 = self.data.info[t_start][i]
             t1 = self.data.info[t_end][i]
             self.t0[i], self.t1[i] = t0, t1
+            print(i, t0)
             self.var0[i] = self.compute_var0(i, t0)
             
             if ps == 'var0':

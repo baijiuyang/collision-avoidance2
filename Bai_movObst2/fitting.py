@@ -15,6 +15,7 @@ sys.modules['data_container'] = data_container
 
 # Define approach models for fitting avoidance models
 approaches = {'Bai_movObst1':{'fajen_approach': {}, 'fajen_approach2': {}, 'acceleration_approach': {}}}
+approaches['Bai_movObst1b'] = {'fajen_approach': {}, 'fajen_approach2': {}, 'acceleration_approach': {}}
 
 approaches['Bai_movObst1b']['fajen_approach']['dual_annealing'] = {}
 approaches['Bai_movObst1b']['fajen_approach']['dual_annealing'][-1] = {'name': 'fajen_approach', 'ps': None, 'b1': 3.25, 'k1': 7.5, 'c1': 0.4, 'c2': 0.4, 'k2': 1.4}
