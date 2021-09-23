@@ -16,7 +16,7 @@ from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_
                             cohen_avoid3, cohen_avoid4, acceleration_approach, \
                             perpendicular_avoid, cohen_avoid4_thres, perpendicular_avoid2
 
-def low_speed_event(t, y, placeholder1, placeholder2): return norm(y[8:10]) - 0.1
+def low_speed_event(t, y, placeholder1, placeholder2, placeholder3): return norm(y[8:10]) - 0.1
 low_speed_event.terminal = True
 low_speed_event.direction = -1
 
@@ -211,19 +211,16 @@ class ODESimulator:
         else:
             t_eval = np.linspace(0, t1 - t0 - 1, t1 - t0) / self.Hz
         try:
-            # sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0,
-                # method='LSODA', t_eval=t_eval, args=[self.models, self.args, i_trial],
-                # events=low_speed_event, atol=1e-3, rtol=1e-2)
             sol = solve_ivp(self.ode_func, [0, t_eval[-1]], var0,
                 method='LSODA', t_eval=t_eval, args=[self.models, self.args, i_trial],
-                atol=1e-3, rtol=1e-2)
+                events=low_speed_event, atol=1e-3, rtol=1e-2)
             xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds, w = sol.y
-        except:
-            print('solve_ivp crashed. Switch to Euler method')
+        except Exception as e:
+            print(f'solve_ivp crashed on i_trial={i_trial} with error message "{e}". Switch to Euler method')
             sol = ODESimulator.odeEuler(self.ode_func, t_eval, var0, args=[self.models, self.args, i_trial])
             xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds, w = np.transpose(sol)
         if len(x) != len(t_eval):
-            print(f'simulation ended early on trial {i_trial}, switch to Euler method')
+            print(f'simulation ended early on i_trial={i_trial}, switch to Euler method')
             t_eval2 = t_eval[ : len(t_eval)-len(x)]
             var0 = [xg[-1], yg[-1], xo[-1], yo[-1], vxo[-1], vyo[-1], x[-1], y[-1], vx[-1], vy[-1], a[-1], phi[-1], s[-1], dphi[-1], ds[-1], w[-1]]
             y2 = ODESimulator.odeEuler(self.ode_func, t_eval2, var0, args=[self.models, self.args, i_trial])
