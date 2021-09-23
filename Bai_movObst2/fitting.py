@@ -17,6 +17,36 @@ sys.modules['data_container'] = data_container
 approaches = {'Bai_movObst1':{'fajen_approach': {}, 'fajen_approach2': {}, 'acceleration_approach': {}}}
 approaches['Bai_movObst1b'] = {'fajen_approach': {}, 'fajen_approach2': {}, 'acceleration_approach': {}}
 
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'] = {}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][-1] = {'name': 'fajen_approach', 'b1': 4.296329212568901, 'k1': 3.876411184381646, 'c1': 2.373202635931417, 'c2': 1.0940365636783889, 'k2': 1.0565235274635225}
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][0] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][1] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][2] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][3] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][4] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][6] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][7] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][9] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][10] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][11] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][12] = 
+# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][13] = 
+
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'] = {}
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][-1] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][0] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][1] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][2] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][3] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][4] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][6] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][7] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][9] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][10] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][11] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][12] = 
+# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][13] = 
+
 approaches['Bai_movObst1b']['fajen_approach']['dual_annealing'] = {}
 approaches['Bai_movObst1b']['fajen_approach']['dual_annealing'][-1] = {'name': 'fajen_approach', 'ps': None, 'b1': 3.25, 'k1': 7.5, 'c1': 0.4, 'c2': 0.4, 'k2': 1.4}
 approaches['Bai_movObst1b']['fajen_approach']['dual_annealing'][0] = {'name': 'fajen_approach', 'b1': 1.3118996599538175, 'k1': 20.05817176956081, 'c1': 2.533333934342072, 'c2': 0.07555087088494414, 'k2': 0.7413974342994933, 'ps': 1.282479471344188}
