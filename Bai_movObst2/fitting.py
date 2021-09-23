@@ -14,38 +14,39 @@ from packages import data_container
 sys.modules['data_container'] = data_container
 
 # Define approach models for fitting avoidance models
-approaches = {'Bai_movObst1':{'fajen_approach': {}, 'fajen_approach2': {}, 'acceleration_approach': {}}}
+approaches = {}
+approaches['Bai_movObst1'] = {'fajen_approach': {}, 'fajen_approach2': {}, 'acceleration_approach': {}}
 approaches['Bai_movObst1b'] = {'fajen_approach': {}, 'fajen_approach2': {}, 'acceleration_approach': {}}
 
 approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'] = {}
 approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][-1] = {'name': 'fajen_approach', 'b1': 4.296329212568901, 'k1': 3.876411184381646, 'c1': 2.373202635931417, 'c2': 1.0940365636783889, 'k2': 1.0565235274635225}
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][0] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][1] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][2] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][3] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][4] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][6] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][7] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][9] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][10] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][11] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][12] = 
-# approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][13] = 
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][0] = {'name': 'fajen_approach', 'b1': 5.171374631693293, 'k1': 3.7748704888285456, 'c1': 0.2524727891811863, 'c2': 0.9670404267366893, 'k2': 0.9778603110291152}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][1] = {'name': 'fajen_approach', 'b1': 4.687275769750559, 'k1': 1.6513680556736985, 'c1': 0.3040389605597095, 'c2': 2.6818082947581727, 'k2': 1.3711088659320352}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][2] = {'name': 'fajen_approach', 'b1': 3.2242608458522133, 'k1': 6.598949320560229, 'c1': 0.5992242093062996, 'c2': 0.5130353096053771, 'k2': 0.9606261544156356}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][3] = {'name': 'fajen_approach', 'b1': 2.1553858457123383, 'k1': 2.4250753925187736, 'c1': 0.5379235884706337, 'c2': 0.9395101950577249, 'k2': 1.2778585399685836}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][4] = {'name': 'fajen_approach', 'b1': 3.013949086307595, 'k1': 1.9714483648445507, 'c1': 0.47859753218527606, 'c2': 1.5331239229201745, 'k2': 1.0840935091122041}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][6] = {'name': 'fajen_approach', 'b1': 4.420933310055661, 'k1': 3.5706426083503446, 'c1': 0.3146817674488948, 'c2': 0.7220059641040694, 'k2': 1.1120585827002478}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][7] = {'name': 'fajen_approach', 'b1': 3.853879812194764, 'k1': 3.223946745381489, 'c1': 0.3853634365918022, 'c2': 1.4075153762917059, 'k2': 1.6695892746375836}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][9] = {'name': 'fajen_approach', 'b1': 8.412773060911043, 'k1': 7.576581326417636, 'c1': 0.32595839644972346, 'c2': 0.713326049149128, 'k2': 0.822573324027422}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][10] = {'name': 'fajen_approach', 'b1': 4.717438327725703, 'k1': 2.6515951111242804, 'c1': 0.4538067831085721, 'c2': 1.1165981281203992, 'k2': 0.8160458132648651}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][11] = {'name': 'fajen_approach', 'b1': 2.812970031319312, 'k1': 2.384120199630047, 'c1': 3.0918480881358144, 'c2': 1.3587018979322045, 'k2': 0.7928858954051313}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][12] = {'name': 'fajen_approach', 'b1': 5.472415932291602, 'k1': 3.6570987973910443, 'c1': 0.2448513181611536, 'c2': 0.8575130568802705, 'k2': 1.0810204178683263}
+approaches['Bai_movObst1b']['fajen_approach']['differential_evolution'][13] = {'name': 'fajen_approach', 'b1': 4.183141558927925, 'k1': 6.26502602722788, 'c1': 0.4605941086625824, 'c2': 0.5478517466755397, 'k2': 0.9681391241515049}
 
 approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'] = {}
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][-1] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][0] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][1] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][2] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][3] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][4] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][6] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][7] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][9] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][10] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][11] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][12] = 
-# approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][13] = 
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][-1] = {'name': 'fajen_approach2', 'b1': 3.7380520763369196, 'k1': 2.87947916970264, 'c1': 0.2206162881805807, 'c2': 0.960123052819782, 'b2': 2.359847074014972, 'k2': 2.570997808604569}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][0] = {'name': 'fajen_approach2', 'b1': 4.685325039598137, 'k1': 6.9855179157418155, 'c1': 0.5320768638356439, 'c2': 0.5268734750702514, 'b2': 4.178247872327981, 'k2': 4.094538191141033}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][1] = {'name': 'fajen_approach2', 'b1': 4.877686344068194, 'k1': 1.886022196454624, 'c1': 0.2631880832575354, 'c2': 2.3470280774261414, 'b2': 2.741205811548106, 'k2': 3.7409117799177496}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][2] = {'name': 'fajen_approach2', 'b1': 2.7188629441551027, 'k1': 3.368744419890986, 'c1': 0.2383054872129715, 'c2': 0.6720200216353054, 'b2': 3.29234668702906, 'k2': 3.2958464957519973}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][3] = {'name': 'fajen_approach2', 'b1': 2.3009874286387535, 'k1': 1.7697759047952653, 'c1': 4.075942164242822, 'c2': 1.498451942346544, 'b2': 2.7737417670028695, 'k2': 3.5764157256875557}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][4] = {'name': 'fajen_approach2', 'b1': 2.894962564521153, 'k1': 1.2822457997984065, 'c1': 0.24855407698568194, 'c2': 2.151926726710701, 'b2': 2.592221307241384, 'k2': 2.9209177936258683}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][6] = {'name': 'fajen_approach2', 'b1': 5.056242688735129, 'k1': 2.658255212225606, 'c1': 0.23114083410108702, 'c2': 1.0949314221719848, 'b2': 2.304749263658365, 'k2': 2.5332510646561786}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][7] = {'name': 'fajen_approach2', 'b1': 3.868166988451832, 'k1': 1.3488392821205601, 'c1': 0.21291899282713, 'c2': 3.3654229635731836, 'b2': 1.7641173702180104, 'k2': 2.6966150116658043}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][9] = {'name': 'fajen_approach2', 'b1': 8.006003239906777, 'k1': 1.9077017222135435, 'c1': 0.24254561076127432, 'c2': 3.1096529591782973, 'b2': 3.2273105804422095, 'k2': 2.8563388977254025}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][10] = {'name': 'fajen_approach2', 'b1': 4.294586773127741, 'k1': 10.940580271301643, 'c1': 0.7249070798631742, 'c2': 0.230122685199928, 'b2': 3.129184115912155, 'k2': 2.662932210845456}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][11] = {'name': 'fajen_approach2', 'b1': 2.6686147220499743, 'k1': 5.738830402782805, 'c1': 0.778277559046697, 'c2': 0.4992475894022052, 'b2': 3.3906476034125292, 'k2': 2.8279395254386674}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][12] = {'name': 'fajen_approach2', 'b1': 7.7855258192068435, 'k1': 4.068891048830318, 'c1': 0.3066495719696504, 'c2': 1.2196321300214885, 'b2': 2.70757462588659, 'k2': 3.0054711131627405}
+approaches['Bai_movObst1b']['fajen_approach2']['differential_evolution'][13] = {'name': 'fajen_approach2', 'b1': 4.075907968599436, 'k1': 9.243017312440472, 'c1': 0.5831183555340775, 'c2': 0.36162337833154756, 'b2': 2.329812666404041, 'k2': 2.347732705113913}
 
 approaches['Bai_movObst1b']['fajen_approach']['dual_annealing'] = {}
 approaches['Bai_movObst1b']['fajen_approach']['dual_annealing'][-1] = {'name': 'fajen_approach', 'ps': None, 'b1': 3.25, 'k1': 7.5, 'c1': 0.4, 'c2': 0.4, 'k2': 1.4}
@@ -75,7 +76,7 @@ approaches['Bai_movObst1']['fajen_approach']['differential_evolution'][8] = {'na
 approaches['Bai_movObst1']['fajen_approach']['differential_evolution'][9] = {'name': 'fajen_approach', 'b1': 1.1936413326262518, 'k1': 1.5253260080485234, 'c1': 4.71969731760836, 'c2': 0.7389384145132375, 'k2': 0.37612127377107535, 'ps': 1.1967108147865295}
 approaches['Bai_movObst1']['fajen_approach']['differential_evolution'][10] = {'name': 'fajen_approach', 'b1': 1.2398029027292385, 'k1': 14.369326267732422, 'c1': 0.7651801554578793, 'c2': 0.13957426997817068, 'k2': 0.4360750101027109, 'ps': 1.056705515676128}
 
-approaches = {'Fajen_steer1a':{'fajen_approach': {}, 'fajen_approach2': {}, 'acceleration_approach': {}}}
+approaches['Fajen_steer1a'] = {'fajen_approach': {}, 'fajen_approach2': {}, 'acceleration_approach': {}}
 
 approaches['Fajen_steer1a']['fajen_approach']['differential_evolution'] = {}
 approaches['Fajen_steer1a']['fajen_approach']['differential_evolution'][-1] = {'name': 'fajen_approach', 'b1':2.01938384, 'k1':4.90527274, 'c1':2.96094879, 'c2':0.50896525, 'k2':1.61216734}
