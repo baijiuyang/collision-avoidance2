@@ -299,14 +299,14 @@ class ODESimulator:
             save (bool): Flag for saving the animation in the current working directory.
         '''
         # Trial index in data instead of simulation results (because some trials are skipped in simulation)
-        labels = ['agent', 'goal']
+        labels = ['model', 'goal']
         if self.data:
             j_trial = self.i_trials[i_trial]
             if 'obst_speed' in self.data.info and 'obst_angle' in self.data.info and \
             (self.data.info['obst_speed'][j_trial] == 0 or abs(self.data.info['obst_angle'][j_trial]) == 180):
                 print('This trial is not simulated')
                 return
-            ws = [0.4, self.data.info['w_goal']]
+            ws = [0.4, self.data.info['w_goal'], 0.4]
             p_subj = self.data.info['p_subj'][j_trial]            
             # Pad values to p_pred to give it the same length as p_subj
             t0 = self.t0[j_trial]
