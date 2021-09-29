@@ -13,6 +13,7 @@ def fajen_approach(args, phi, dphi, s, psi, r):
     ps, b1, k1, c1, c2, k2 = args['ps'], args['b1'], args['k1'], args['c1'], args['c2'], args['k2']
     ddphi = -b1 * dphi - k1 * (phi - psi) * (exp(-c1 * r) + c2)
     ds = k2 * (ps - s)
+    # print(f'fajen_approach ds {ds} ddphi {ddphi}')
     return {'ds': ds, 'ddphi': ddphi}
 
 def fajen_approach2(args, phi, dphi, s, ds, psi, r):
@@ -27,6 +28,7 @@ def cohen_avoid(args, dphi, beta, dpsi, r, s):
     indicator = absolute(beta) < pi/2
     ddphi = -b1 * dphi - k1 * dpsi * exp(-c5 * absolute(dpsi) - c6 * r) * indicator
     ds = -b2 * (s - ps) + sign(beta) * k2 * dpsi * exp(-c7 * absolute(dpsi) - c8 * r) * indicator
+    # print(f'cohen_avoid ds {ds} ddphi {ddphi} dpsi {dpsi}')
     return {'ds': ds, 'ddphi': ddphi}
     
 # Known issue: When dpsi is zero, it becomes a null model.

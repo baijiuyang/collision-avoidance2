@@ -61,6 +61,7 @@ class ODESimulator:
         self.phi_pred = []
         self.dphi_pred = []
         self.pass_order_pred = []
+        self.ds_pred = []
     
     def use_data(self):
         self.Hz = self.data.Hz
@@ -197,6 +198,7 @@ class ODESimulator:
             ddphi = dds = da = 0
         elif 'da' in output:
             pass
+        # print(f'total ds {ds} dphi {dphi} ddphi {ddphi}')
         dvardt = [0, 0, vxo, vyo, 0, 0, vx, vy, ax, ay, da, dphi, ds, ddphi, dds, dw]
         return dvardt
     
@@ -232,6 +234,7 @@ class ODESimulator:
         self.w_obst.append(w)
         self.phi_pred.append(phi)
         self.s_pred.append(s)
+        self.ds_pred.append(ds)
         if self.data:
             self.i_trials.append(i_trial)
             self.p_subj.append(self.data.info['p_subj'][i_trial][t0:t0 + len(x)])
