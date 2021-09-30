@@ -205,7 +205,10 @@ def error(x, simulator, trials, logfile, args):
     toc = time.perf_counter()
     with open(logfile, 'a') as file:
         log = [str(x) for x in [i_iter, simulator.models, err, 'order_accuracy', accuracy, hms(toc-tic)]]
-        file.write('\t'.join(log) + '\n')
+        try:
+            file.write('\t'.join(log) + '\n')
+        except:
+            print(log)
     simulator.reset()
     return err
 
