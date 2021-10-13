@@ -308,7 +308,7 @@ if __name__ == "__main__":
     DIAGONAL = (DIMENSION_X**2 + DIMENSION_Z**2)**(1.0/2)# The length of the diagonal line of the experimental space
     ROOM_ANGLE = math.atan(DIMENSION_X/DIMENSION_Z) # the anger (in radian) between the diagonal and the shorter edge of the room
     DIAGONAL_UNIT = [[-math.sin(ROOM_ANGLE), 0, -math.cos(ROOM_ANGLE)], [math.sin(ROOM_ANGLE), 0, math.cos(ROOM_ANGLE)]]
-    RAMP_DIST = 3 # acceleration distance before obstacle appears
+    RAMP_DIST = 3 # acceleration distance before goal appears
     END_DIST = 1 # distance to the goal pole, within which the trial end.
     PACE_DIST = 1 # distance between pacePole and subj (homePole)
     
