@@ -36,7 +36,7 @@ def create_cmd_args():
     args.training_model_type = args.training_model.split('_')[1][:3]
     return args
 
-def Bai_movObst1(subjects, args):
+def Bai_movObst1(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -61,7 +61,7 @@ def Bai_movObst1(subjects, args):
     print(trials)
     return simulator, trials
 
-def Bai_movObst1b(subjects, args):
+def Bai_movObst1b(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -77,7 +77,7 @@ def Bai_movObst1b(subjects, args):
     simulator = ODESimulator(data=data)
     return simulator, trials
 
-def Fajen_steer1a(subjects, args):
+def Fajen_steer1a(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -93,7 +93,7 @@ def Fajen_steer1a(subjects, args):
     simulator = ODESimulator(data=data)
     return simulator, trials
     
-def Cohen_movObst1(subjects, args):
+def Cohen_movObst1(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -108,7 +108,7 @@ def Cohen_movObst1(subjects, args):
     simulator = ODESimulator(data=data)
     return simulator, trials
 
-def Cohen_movObst2(subjects, args):
+def Cohen_movObst2(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
                                         'Raw_Data',
@@ -125,15 +125,15 @@ def Cohen_movObst2(subjects, args):
 
 def build_simulator(args, subjects):
     if args.experiment_name == 'Bai_movObst1':
-        simulator = Bai_movObst1(subjects, args)
+        simulator = Bai_movObst1(subjects)
     elif args.experiment_name == 'Bai_movObst1b':
-        simulator = Bai_movObst1b(subjects, args)
+        simulator = Bai_movObst1b(subjects)
     elif args.experiment_name == 'Cohen_movObst1':
-        simulator = Cohen_movObst1(subjects, args)
+        simulator = Cohen_movObst1(subjects)
     elif args.experiment_name == 'Cohen_movObst2':
-        simulator = Cohen_movObst2(subjects, args)
+        simulator = Cohen_movObst2(subjects)
     elif args.experiment_name == 'Fajen_steer1a':
-        simulator = Fajen_steer1a(subjects, args)
+        simulator = Fajen_steer1a(subjects)
     else:
         raise Exception('experiment_name invalid')
     return simulator
