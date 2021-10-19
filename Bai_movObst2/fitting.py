@@ -50,12 +50,6 @@ def Bai_movObst1(subjects):
             data.info['obst_speed'][i] != 0 and
             abs(data.info['obst_angle'][i]) != 180 and
             i not in data.dump):
-            if args.trial == 'correct_order':
-                xg, yg, xo, yo, vxo, vyo, x, y, vx, vy, a, phi, s, dphi, ds, w0 = sim.compute_var0(i, sim.data.info['obst_onset'][i])
-                model_order = np.sign(-d_psi([x, y], [xo, yo], [vx, vy], [vxo, vyo]) * sim.data.info['obst_angle'][i])
-                true_order = data.info['pass_order'][i]
-                if model_order != true_order:
-                    continue
             trials.append(i)
     simulator = ODESimulator(data=data)
     print(trials)
