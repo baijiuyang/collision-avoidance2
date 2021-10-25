@@ -72,7 +72,7 @@ def acceleration_approach(args, p0, p1, v0):
     a = k * (vp - array(v0))
     return {'a': a}
 
-def da_approach(args, p0, p1, v0, a0):
+def jerk_approach(args, p0, p1, v0, a0):
     ps, k, b = args['ps'], args['k'], args['b']
     vi = array(p1) - array(p0)
     vp = vi * ps / norm(vi, axis=-1)
