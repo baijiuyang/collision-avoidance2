@@ -62,6 +62,12 @@ def cohen_avoid4(args, beta, dtheta, dpsi):
     ddphi = -k1 * sign(dpsi) * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * indicator
     return {'dds': dds, 'ddphi': ddphi}
 
+def cohen_avoid4_heading(args, beta, dtheta, dpsi):
+    k1, c5, c6 = args['k1'], args['c5'], args['c6']
+    indicator = absolute(beta) < pi/2
+    ddphi = -k1 * sign(dpsi) * exp(-c5 * absolute(dpsi)) * (1 - exp(-c6 * maximum(0, dtheta))) * indicator
+    return {'dds': 0, 'ddphi': ddphi}
+
 # Known issue: When dpsi is zero, it becomes a null model.
 def cohen_avoid4_thres(args, beta, dtheta, dpsi):
     k1, c5, c6, k2, c7, c8, thres = args['k1'], args['c5'], args['c6'], args['k2'], args['c7'], args['c8'], args['thres']

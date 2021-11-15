@@ -177,6 +177,9 @@ def error(x, simulator, trials, logfile, args):
             avoid = {'name': 'cohen_avoid4',
              'k1': x[0], 'c5': x[1], 'c6': x[2],
              'k2': x[3], 'c7': x[4], 'c8': x[5]}
+        elif args.avoid_model == 'cohen_avoid4_heading':
+            avoid = {'name': 'cohen_avoid4_heading',
+             'k1': x[0], 'c5': x[1], 'c6': x[2]}
         elif args.avoid_model == 'cohen_avoid4_thres':
             avoid = {'name': 'cohen_avoid4_thres',
              'k1': x[0], 'c5': x[1], 'c6': x[2],

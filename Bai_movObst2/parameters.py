@@ -119,6 +119,7 @@ model_bounds['cohen_avoid_heading'] = [(0, 50), (0, 800), (0.1, 20), (0.1, 10)]
 model_bounds['cohen_avoid2'] = [(0, 50), (0, 800), (0.1, 10), (1, 30), (0, 50), (0, 800), (0.1, 10), (1, 30)]
 model_bounds['cohen_avoid3'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30)]
 model_bounds['cohen_avoid4'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30)]
+model_bounds['cohen_avoid4_heading'] = [(0, 100), (0.1, 10), (1, 30)]
 model_bounds['cohen_avoid4_thres'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30), (0, 0.1)]
 model_bounds['perpendicular_avoid'] = [(0, 50), (0.0001, 50)]
 model_bounds['perpendicular_avoid2'] = [(0, 50), (0.0001, 20)]
@@ -126,9 +127,9 @@ model_bounds['perpendicular_avoid2'] = [(0, 50), (0.0001, 20)]
 
 # Fitted avoidance model
 avoidances = {}
-avoidances['Cohen_movObst1'] = {'cohen_avoid': {}, 'cohen_avoid2': {}, 'cohen_avoid3': {}, 'cohen_avoid4': {}, 'perpendicular_avoid': {}, 'perpendicular_avoid2': {}}
-avoidances['Cohen_movObst2'] = {'cohen_avoid': {}, 'cohen_avoid2': {}, 'cohen_avoid3': {}, 'cohen_avoid4': {}, 'perpendicular_avoid': {}, 'perpendicular_avoid2': {}}
-avoidances['Bai_movObst1'] = {'cohen_avoid': {}, 'cohen_avoid2': {}, 'cohen_avoid3': {}, 'cohen_avoid4': {}, 'perpendicular_avoid': {}, 'perpendicular_avoid2': {}}
+avoidances['Cohen_movObst1'] = {'cohen_avoid': {}, 'cohen_avoid2': {}, 'cohen_avoid3': {}, 'cohen_avoid4': {}, 'perpendicular_avoid': {}, 'perpendicular_avoid2': {}, 'cohen_avoid_heading': {}}
+avoidances['Cohen_movObst2'] = {'cohen_avoid': {}, 'cohen_avoid2': {}, 'cohen_avoid3': {}, 'cohen_avoid4': {}, 'perpendicular_avoid': {}, 'perpendicular_avoid2': {}, 'cohen_avoid_heading': {}}
+avoidances['Bai_movObst1'] = {'cohen_avoid': {}, 'cohen_avoid2': {}, 'cohen_avoid3': {}, 'cohen_avoid4': {}, 'perpendicular_avoid': {}, 'perpendicular_avoid2': {}, 'cohen_avoid_heading': {}}
 
 avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'] = {}
 avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'][-1] = {'name': 'cohen_avoid', 'b1': 2.1260796879288923, 'k1': 673.0529452234115, 'c5': 14.968106833780706, 'c6': 1.0453773247966653, 'b2': 0.006893708430404716, 'k2': 13.305731910646147, 'c7': 6.887725262876937, 'c8': 0.626517752901824}
@@ -205,6 +206,8 @@ avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'][11
 avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'][12] = {}
 avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'][13] = {}
 
+avoidances['Cohen_movObst1']['cohen_avoid_heading']['differential_evolution'] = {}
+avoidances['Cohen_movObst1']['cohen_avoid_heading']['differential_evolution'][-1] = {'name': 'cohen_avoid_heading', 'b1': 1.5375301722264427, 'k1': 380.14137984134635, 'c5': 11.369262765614588, 'c6': 1.0349190438337557}
 
 avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution'] = {}
 avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution'][-1] = {'name': 'cohen_avoid', 'b1': 3.363638816353943, 'k1': 95.09517044816117, 'c5': 11.400136527121575, 'c6': 0.48808376780737783, 'b2': 0.0, 'k2': 594.7235062798342, 'c7': 4.535696669262642, 'c8': 3.777451780362486}

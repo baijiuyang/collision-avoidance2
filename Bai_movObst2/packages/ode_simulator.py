@@ -15,7 +15,7 @@ from packages.helper import play_trajs, sp2a, sp2v, psi, beta, d_theta, \
 from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_avoid2, \
                             cohen_avoid3, cohen_avoid4, acceleration_approach, \
                             perpendicular_avoid, cohen_avoid4_thres, perpendicular_avoid2, \
-                            jerk_approach, cohen_avoid_heading
+                            jerk_approach, cohen_avoid_heading, cohen_avoid4_heading
 
 def low_speed_event(t, y, placeholder1, placeholder2, placeholder3): return norm(y[8:10]) - 0.1
 low_speed_event.terminal = True
@@ -174,6 +174,9 @@ class ODESimulator:
                     output[key] += val
             elif model['name'] == 'cohen_avoid4':
                 for key, val in cohen_avoid4(model, beta_o, d_theta_o, d_psi_o).items():
+                    output[key] += val
+            elif model['name'] == 'cohen_avoid4_heading':
+                for key, val in cohen_avoid4_heading(model, beta_o, d_theta_o, d_psi_o).items():
                     output[key] += val
             elif model['name'] == 'cohen_avoid4_thres':
                 for key, val in cohen_avoid4_thres(model, beta_o, d_theta_o, d_psi_o).items():
