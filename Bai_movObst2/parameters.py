@@ -115,6 +115,7 @@ model_bounds['fajen_approach2'] = [(0, 10), (0, 20), (0, 5), (0, 5), (0, 10), (0
 model_bounds['acceleration_approach'] = [(0, 10)]
 model_bounds['jerk_approach'] = [(0, 100), (0, 50)]
 model_bounds['cohen_avoid'] = [(0, 50), (0, 800), (0.1, 20), (0.1, 10), (0, 50), (0, 800), (0.1, 10), (0.1, 10)]
+model_bounds['cohen_avoid_heading'] = [(0, 50), (0, 800), (0.1, 20), (0.1, 10)]
 model_bounds['cohen_avoid2'] = [(0, 50), (0, 800), (0.1, 10), (1, 30), (0, 50), (0, 800), (0.1, 10), (1, 30)]
 model_bounds['cohen_avoid3'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30)]
 model_bounds['cohen_avoid4'] = [(0, 100), (0.1, 10), (1, 30), (0, 100), (0.1, 10), (1, 30)]

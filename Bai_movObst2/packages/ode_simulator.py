@@ -15,7 +15,7 @@ from packages.helper import play_trajs, sp2a, sp2v, psi, beta, d_theta, \
 from packages.models import fajen_approach, fajen_approach2, cohen_avoid, cohen_avoid2, \
                             cohen_avoid3, cohen_avoid4, acceleration_approach, \
                             perpendicular_avoid, cohen_avoid4_thres, perpendicular_avoid2, \
-                            jerk_approach
+                            jerk_approach, cohen_avoid_heading
 
 def low_speed_event(t, y, placeholder1, placeholder2, placeholder3): return norm(y[8:10]) - 0.1
 low_speed_event.terminal = True
@@ -162,6 +162,9 @@ class ODESimulator:
                     output[key] += val
             elif model['name'] == 'cohen_avoid':
                 for key, val in cohen_avoid(model, dphi, beta_o, d_psi_o, r_o, s).items():
+                    output[key] += val
+            elif model['name'] == 'cohen_avoid_heading':
+                for key, val in cohen_avoid_heading(model, dphi, beta_o, d_psi_o, r_o).items():
                     output[key] += val
             elif model['name'] == 'cohen_avoid2':                    
                 for key, val in cohen_avoid2(model, dphi, s, beta_o, d_theta_o, d_psi_o).items():
@@ -359,10 +362,10 @@ class ODESimulator:
                 trues.append(norm(v_subj, axis=-1))
         elif var == 'phi':
             preds = self.phi_pred
-            trues = []
-            v_subj = gradient(self.p_subj, axis=0) * Hz            
+            trues = []           
             for i in range(len(preds)):
-                trues.append(v2sp(v_subj[i], ref=self.ref)[1])
+                v_subj = gradient(self.p_subj[i], axis=0) * Hz 
+                trues.append(v2sp(v_subj, ref=self.ref)[1])
         elif var == 'order':
             preds = self.pass_order_pred
             trues = np.array(self.data.info['pass_order'])[self.i_trials]

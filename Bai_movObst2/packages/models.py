@@ -30,7 +30,14 @@ def cohen_avoid(args, dphi, beta, dpsi, r, s):
     ds = -b2 * (s - ps) + sign(beta) * k2 * dpsi * exp(-c7 * absolute(dpsi) - c8 * r) * indicator
     # print(f'cohen_avoid ds {ds} ddphi {ddphi} dpsi {dpsi}')
     return {'ds': ds, 'ddphi': ddphi}
-    
+
+def cohen_avoid_heading(args, dphi, beta, dpsi, r):
+    b1, k1, c5, c6 = args['b1'], args['k1'], args['c5'], args['c6']
+    indicator = absolute(beta) < pi/2
+    ddphi = -b1 * dphi - k1 * dpsi * exp(-c5 * absolute(dpsi) - c6 * r) * indicator
+    # print(f'cohen_avoid ds {ds} ddphi {ddphi} dpsi {dpsi}')
+    return {'ds': 0, 'ddphi': ddphi}
+
 # Known issue: When dpsi is zero, it becomes a null model.
 def cohen_avoid2(args, dphi, s, beta, dtheta, dpsi):
     ps, b1, k1, c5, c6, b2, k2, c7, c8 = args['ps'], args['b1'], args['k1'], args['c5'], args['c6'], args['b2'], args['k2'], args['c7'], args['c8']
