@@ -127,9 +127,30 @@ model_bounds['perpendicular_avoid2'] = [(0, 50), (0.0001, 20)]
 
 # Fitted avoidance model
 avoidances = {}
-avoidances['Cohen_movObst1'] = {'cohen_avoid': {}, 'cohen_avoid2': {}, 'cohen_avoid3': {}, 'cohen_avoid4': {}, 'perpendicular_avoid': {}, 'perpendicular_avoid2': {}, 'cohen_avoid_heading': {}}
-avoidances['Cohen_movObst2'] = {'cohen_avoid': {}, 'cohen_avoid2': {}, 'cohen_avoid3': {}, 'cohen_avoid4': {}, 'perpendicular_avoid': {}, 'perpendicular_avoid2': {}, 'cohen_avoid_heading': {}}
-avoidances['Bai_movObst1'] = {'cohen_avoid': {}, 'cohen_avoid2': {}, 'cohen_avoid3': {}, 'cohen_avoid4': {}, 'perpendicular_avoid': {}, 'perpendicular_avoid2': {}, 'cohen_avoid_heading': {}}
+avoidances['Cohen_movObst1'] = {'cohen_avoid': {},
+                                'cohen_avoid2': {},
+                                'cohen_avoid3': {},
+                                'cohen_avoid4': {},
+                                'perpendicular_avoid': {},
+                                'perpendicular_avoid2': {},
+                                'cohen_avoid_heading': {},
+                                'cohen_avoid4_heading': {}}
+avoidances['Cohen_movObst2'] = {'cohen_avoid': {},
+                                'cohen_avoid2': {},
+                                'cohen_avoid3': {},
+                                'cohen_avoid4': {},
+                                'perpendicular_avoid': {},
+                                'perpendicular_avoid2': {},
+                                'cohen_avoid_heading': {},
+                                'cohen_avoid4_heading': {}}
+avoidances['Bai_movObst1'] = {'cohen_avoid': {},
+                              'cohen_avoid2': {},
+                              'cohen_avoid3': {},
+                              'cohen_avoid4': {},
+                              'perpendicular_avoid': {},
+                              'perpendicular_avoid2': {},
+                              'cohen_avoid_heading': {},
+                              'cohen_avoid4_heading': {}}
 
 avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'] = {}
 avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'][-1] = {'name': 'cohen_avoid', 'b1': 2.1260796879288923, 'k1': 673.0529452234115, 'c5': 14.968106833780706, 'c6': 1.0453773247966653, 'b2': 0.006893708430404716, 'k2': 13.305731910646147, 'c7': 6.887725262876937, 'c8': 0.626517752901824}
