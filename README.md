@@ -13,14 +13,18 @@ sklearn
 mpl_toolkits
 ```
 # Experiment
-Experiment_Code/experiment.py (requires Vizard 5+)
+movObst1.py movObst1b.py movObst2a.py movObst2b.py (requires Vizard 5+)
 # Data processing
-Experiment_Code/import_data.ipynb
+../import_data_[experiment name].ipynb
 # Data structure
-Experiment/packages/data_container.py
+../packages/data_container.py
 # Simulation
-Experiment_Code/simulation.ipynb
+../simulation.ipynb
 # Data visualization and analysis
-Experiment_Code/anaylsis.ipynb
+../anaylsis.ipynb
 # Models
-Experiment/packages/models.py
+../packages/models.py
+# Fitting
+../fitting.py
+# Fitted parameters
+../parameters.py
