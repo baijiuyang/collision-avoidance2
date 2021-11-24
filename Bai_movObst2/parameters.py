@@ -380,7 +380,7 @@ avoidances['Bai_movObst1']['cohen_avoid4_heading']['differential_evolution'] = {
 avoidances['Bai_movObst1']['cohen_avoid4_heading']['differential_evolution'][-1] = {'name': 'cohen_avoid4_heading', 'k1': 7.0288327450614645, 'c5': 5.699504822685455, 'c6': 15.368240959940403}
 
 avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'] = {}
-avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'][-1] = {'name': 'perpendicular_avoid', 'k': 11.397868452412597, 'c': 8.813338864706262
+avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'][-1] = {'name': 'perpendicular_avoid', 'k': 11.397868452412597, 'c': 8.813338864706262}
 avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'][0] = {}
 avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'][1] = {}
 avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'][2] = {}
