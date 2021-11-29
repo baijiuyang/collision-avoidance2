@@ -229,12 +229,7 @@ def main():
     simulator, trials = build_simulator(args, subjects)
     logfile = 'fitting_log_' + ymdhms() + '_' + str(args.subject) + '.txt'
     with open(logfile, 'a') as file:
-        file.write(f'experiment_name: {args.experiment_name}\nsubject: {args.subject}\ntrials: {trials}\n'
-            f'approach_experiment: {args.approach_experiment}\n'
-            f'approach_model: {args.approach_model}, avoid_model: {args.avoid_model}\n'
-            f'training_model: {args.training_model}\n'            
-            f'method: {args.method}\nbounds: {bounds}\nt_start: {args.t_start}, t_end: {args.t_end}\n'
-            f'preferred speed: {args.ps}\nnotes: {notes}\n')              
+        file.write(f'trials: {trials}\nargs: {args}\nbounds: {bounds}\nnotes: {notes}\n')            
     if args.method == 'nelder-mead':
         res = optimize.minimize(error, x0, args=(simulator, trials, logfile, args), method='nelder-mead',
                         options={'xatol': 1e-6, 'disp': True, 'adaptive': True})
