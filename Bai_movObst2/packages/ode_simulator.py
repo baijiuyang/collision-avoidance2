@@ -390,7 +390,7 @@ class ODESimulator:
         if all_errors:
             if alg == 'RMSE':
                 print('Return values are Mean Squared Errors. Please take the mean of them and then take the square root to get RMSE')
-            return vals
+            return np.array(vals)
         if alg == 'RMSE':
             return np.sqrt(np.mean(vals))
         return np.mean(vals)
