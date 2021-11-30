@@ -187,6 +187,8 @@ class ODESimulator:
             elif model['name'] == 'perpendicular_avoid2':
                 for key, val in perpendicular_avoid2(model, beta_o, psi_o, theta_o, d_theta_o, d_psi_o, ref).items():
                     output[key] += val
+            else:
+                raise Exception(f'Cannot find model name {model["name"]}')
         # for key, value in output.items():
             # if abs(value) > 100:
                 # print(f'Large {key} = {value} encountered. Clip value between [-100, 100]')
