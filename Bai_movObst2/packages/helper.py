@@ -277,8 +277,7 @@ def d_theta(p0, p1, v0, v1, w, dw=0):
     else:
         if len(np.shape(w)) == 0:
             w = [w] * len(p0)
-        if len(np.shape(w)) == 0:
-            dw = [dw] * len(p0)
+            dw = [dw] * len(p0)            
         REs = np.zeros(len(p0))
         for i in range(len(REs)):
             REs[i] = _d_theta(p0[i], p1[i], v0[i], v1[i], w[i], dw[i])
