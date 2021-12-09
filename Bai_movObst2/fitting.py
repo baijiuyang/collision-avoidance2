@@ -229,7 +229,11 @@ def main():
     simulator, trials = build_simulator(args, subjects)
     logfile = 'fitting_log_' + ymdhms() + '_' + str(args.subject) + '.txt'
     with open(logfile, 'a') as file:
-        file.write(f'trials: {trials}\nargs: {args}\nbounds: {bounds}\nnotes: {notes}\n')            
+        file.write(f'trials: {trials}\nargs: {args}\nbounds: {bounds}\n')
+        for key, val in simulator.data.info.items():
+            if 'threshold' in key:
+                file.write(f'{key}: {val}\n')
+        file.write(f'notes: {notes}\n')
     if args.method == 'nelder-mead':
         res = optimize.minimize(error, x0, args=(simulator, trials, logfile, args), method='nelder-mead',
                         options={'xatol': 1e-6, 'disp': True, 'adaptive': True})
