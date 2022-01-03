@@ -71,6 +71,24 @@ def Bai_movObst1b(subjects):
     simulator = ODESimulator(data=data)
     return simulator, trials
 
+def Bai_movObst2(subjects):
+    file = os.path.abspath(os.path.join(os.getcwd(),
+                                        os.pardir,
+                                        'Raw_Data',
+                                        'Bai_movObst2_data_30Hz.pickle'))
+    with open(file, 'rb') as f:
+        data = pickle.load(f)
+    sim = ODESimulator(data=data, ref=[0,1])
+    trials = []
+    for i in range(len(data.trajs)):
+        if (data.info['subj_id'][i] in subjects and
+            data.info['obst_speed'][i] != 0 and
+            i not in data.dump):
+            trials.append(i)
+    simulator = ODESimulator(data=data)
+    print(trials)
+    return simulator, trials
+
 def Fajen_steer1a(subjects):
     file = os.path.abspath(os.path.join(os.getcwd(),
                                         os.pardir,
@@ -122,6 +140,8 @@ def build_simulator(args, subjects):
         simulator = Bai_movObst1(subjects)
     elif args.experiment_name == 'Bai_movObst1b':
         simulator = Bai_movObst1b(subjects)
+    elif args.experiment_name == 'Bai_movObst2':
+        simulator = Bai_movObst2(subjects)
     elif args.experiment_name == 'Cohen_movObst1':
         simulator = Cohen_movObst1(subjects)
     elif args.experiment_name == 'Cohen_movObst2':
@@ -154,10 +174,12 @@ def error(x, simulator, trials, logfile, args):
         else:
             print('approach_model invalid')
     elif args.training_model_type == 'avo':
-        if args.subject == 'all' or args.subject[0] == '-':
-            approach = approaches[args.approach_experiment][args.approach_model][args.method][-1]
+        if (args.subject != 'all' and args.subject[0] != '-' and 
+            args.approach_experiment == 'Bai_movObst1b' and
+            args.experiment_name == 'Bai_movObst1'):
+            approach = approaches[args.approach_experiment][args.approach_model][args.method][int(args.subject)]
         else:
-            approach = approaches[args.approach_experiment][args.approach_model][args.method][int(args.subject)]            
+            approach = approaches[args.approach_experiment][args.approach_model][args.method][-1]
         if args.avoid_model == 'cohen_avoid':
             avoid = {'name': 'cohen_avoid',
              'b1': x[0], 'k1': x[1], 'c5': x[2], 'c6': x[3],
