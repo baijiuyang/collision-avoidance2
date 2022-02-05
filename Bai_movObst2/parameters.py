@@ -153,7 +153,8 @@ avoidances['Bai_movObst1'] = {'cohen_avoid': {},
                               'cohen_avoid4_heading': {}}
 
 avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'] = {}
-avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'][-1] = {'name': 'cohen_avoid', 'b1': 2.1260796879288923, 'k1': 673.0529452234115, 'c5': 14.968106833780706, 'c6': 1.0453773247966653, 'b2': 0.006893708430404716, 'k2': 13.305731910646147, 'c7': 6.887725262876937, 'c8': 0.626517752901824}
+# 0.19077652321401395 order_accuracy 0.84321608040201
+avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid', 'b1': 0.8093007767780838, 'k1': 374.53835960146876, 'c5': 11.763605885702065, 'c6': 1.0266683672796317, 'b2': 0.0, 'k2': 593.7861081468136, 'c7': 9.55544925847897, 'c8': 2.05798599654717}
 avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'][0] = {}
 avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'][1] = {}
 avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'][2] = {}
@@ -168,10 +169,11 @@ avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'][12] = {}
 avoidances['Cohen_movObst1']['cohen_avoid']['differential_evolution'][13] = {}
 
 avoidances['Cohen_movObst1']['cohen_avoid_heading']['differential_evolution'] = {}
-avoidances['Cohen_movObst1']['cohen_avoid_heading']['differential_evolution'][-1] = {'name': 'cohen_avoid_heading', 'b1': 1.5375301722264427, 'k1': 380.14137984134635, 'c5': 11.369262765614588, 'c6': 1.0349190438337557}
+avoidances['Cohen_movObst1']['cohen_avoid_heading']['differential_evolution']['-1dpsi_onset'] = {'name': 'cohen_avoid_heading', 'b1': 1.5375301722264427, 'k1': 380.14137984134635, 'c5': 11.369262765614588, 'c6': 1.0349190438337557}
 
 avoidances['Cohen_movObst1']['cohen_avoid2']['differential_evolution'] = {}
-avoidances['Cohen_movObst1']['cohen_avoid2']['differential_evolution'][-1] = {'name': 'cohen_avoid2', 'b1': 1.313894780845967, 'k1': 393.59559030933247, 'c5': 8.82965005381204, 'c6': 2.3410827991863172, 'b2': 0.0003485317797959908, 'k2': 66.77017554542931, 'c7': 7.602409489606929, 'c8': 1.5994854927685118}
+# 0.1901285989843772 order_accuracy 0.8412060301507538
+avoidances['Cohen_movObst1']['cohen_avoid2']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid2', 'b1': 1.2349633158265405, 'k1': 128.80418613005364, 'c5': 9.75076347435121, 'c6': 8.160165995185125, 'b2': 0.0, 'k2': 9.751939026529449, 'c7': 10.0, 'c8': 20.31149333769062}
 avoidances['Cohen_movObst1']['cohen_avoid2']['differential_evolution'][0] = {}
 avoidances['Cohen_movObst1']['cohen_avoid2']['differential_evolution'][1] = {}
 avoidances['Cohen_movObst1']['cohen_avoid2']['differential_evolution'][2] = {}
@@ -186,7 +188,8 @@ avoidances['Cohen_movObst1']['cohen_avoid2']['differential_evolution'][12] = {}
 avoidances['Cohen_movObst1']['cohen_avoid2']['differential_evolution'][13] = {}
 
 avoidances['Cohen_movObst1']['cohen_avoid3']['differential_evolution'] = {}
-avoidances['Cohen_movObst1']['cohen_avoid3']['differential_evolution'][-1] = {'name': 'cohen_avoid3', 'k1': 40.758773179123104, 'c5': 9.73184518588978, 'c6': 23.508572875262164, 'k2': 35.65382695736378, 'c7': 9.814413003581466, 'c8': 20.776807046770987}
+# 0.1806628219285373 order_accuracy 0.842211055276382
+avoidances['Cohen_movObst1']['cohen_avoid3']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid3', 'k1': 34.354529381388424, 'c5': 9.724597060360962, 'c6': 28.76965929857869, 'k2': 24.141604085458468, 'c7': 9.427836309508633, 'c8': 27.937064770015027}
 avoidances['Cohen_movObst1']['cohen_avoid3']['differential_evolution'][0] = {}
 avoidances['Cohen_movObst1']['cohen_avoid3']['differential_evolution'][1] = {}
 avoidances['Cohen_movObst1']['cohen_avoid3']['differential_evolution'][2] = {}
@@ -201,7 +204,8 @@ avoidances['Cohen_movObst1']['cohen_avoid3']['differential_evolution'][12] = {}
 avoidances['Cohen_movObst1']['cohen_avoid3']['differential_evolution'][13] = {}
 
 avoidances['Cohen_movObst1']['cohen_avoid4']['differential_evolution'] = {}
-avoidances['Cohen_movObst1']['cohen_avoid4']['differential_evolution'][-1] = {'name': 'cohen_avoid4', 'k1': 4.798312212313739, 'c5': 1.4381497616822931, 'c6': 5.126613085209973, 'k2': 18.94607374676705, 'c7': 8.103786608747624, 'c8': 2.167764111347458}
+# 0.18046731918746603 order_accuracy 0.8381909547738694
+avoidances['Cohen_movObst1']['cohen_avoid4']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid4', 'k1': 3.239795322411539, 'c5': 1.4547076116887092, 'c6': 7.3701320561617045, 'k2': 9.254270206225431, 'c7': 4.973658668545465, 'c8': 3.407671408524374}
 avoidances['Cohen_movObst1']['cohen_avoid4']['differential_evolution'][0] = {}
 avoidances['Cohen_movObst1']['cohen_avoid4']['differential_evolution'][1] = {}
 avoidances['Cohen_movObst1']['cohen_avoid4']['differential_evolution'][2] = {}
@@ -216,7 +220,7 @@ avoidances['Cohen_movObst1']['cohen_avoid4']['differential_evolution'][12] = {}
 avoidances['Cohen_movObst1']['cohen_avoid4']['differential_evolution'][13] = {}
 
 avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'] = {}
-avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'][-1] =  {'name': 'perpendicular_avoid', 'k': 16.747579485419234, 'c': 37.86594245245854}
+avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution']['-1obst_onset'] =  {'name': 'perpendicular_avoid', 'k': 16.747579485419234, 'c': 37.86594245245854}
 avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'][0] = {}
 avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'][1] = {}
 avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'][2] = {}
@@ -231,10 +235,11 @@ avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'][12
 avoidances['Cohen_movObst1']['perpendicular_avoid']['differential_evolution'][13] = {}
 
 avoidances['Cohen_movObst1']['cohen_avoid4_heading']['differential_evolution'] = {}
-avoidances['Cohen_movObst1']['cohen_avoid4_heading']['differential_evolution'][-1] = {'name': 'cohen_avoid4_heading', 'k1': 12.160262507168044, 'c5': 1.1741122490946225, 'c6': 1.703848842425795}
+avoidances['Cohen_movObst1']['cohen_avoid4_heading']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid4_heading', 'k1': 12.160262507168044, 'c5': 1.1741122490946225, 'c6': 1.703848842425795}
 
 avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution'] = {}
-avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution'][-1] = {'name': 'cohen_avoid', 'b1': 3.363638816353943, 'k1': 95.09517044816117, 'c5': 11.400136527121575, 'c6': 0.48808376780737783, 'b2': 0.0, 'k2': 594.7235062798342, 'c7': 4.535696669262642, 'c8': 3.777451780362486}
+# 0.2492772784952851 order_accuracy 0.7897142857142857
+avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid', 'b1': 3.363638816353943, 'k1': 95.09517044816117, 'c5': 11.400136527121575, 'c6': 0.48808376780737783, 'b2': 0.0, 'k2': 594.7235062798342, 'c7': 4.535696669262642, 'c8': 3.777451780362486}
 avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution'][0] = {}
 avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution'][1] = {}
 avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution'][2] = {}
@@ -249,10 +254,11 @@ avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution'][12] = {}
 avoidances['Cohen_movObst2']['cohen_avoid']['differential_evolution'][13] = {}
 
 avoidances['Cohen_movObst2']['cohen_avoid_heading']['differential_evolution'] = {}
-avoidances['Cohen_movObst2']['cohen_avoid_heading']['differential_evolution'][-1] = {'name': 'cohen_avoid_heading', 'b1': 4.293726415485055, 'k1': 367.7714285222081, 'c5': 14.196324039474277, 'c6': 0.8005514126692047}
+avoidances['Cohen_movObst2']['cohen_avoid_heading']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid_heading', 'b1': 4.293726415485055, 'k1': 367.7714285222081, 'c5': 14.196324039474277, 'c6': 0.8005514126692047}
 
 avoidances['Cohen_movObst2']['cohen_avoid2']['differential_evolution'] = {}
-avoidances['Cohen_movObst2']['cohen_avoid2']['differential_evolution'][-1] = {'name': 'cohen_avoid2', 'b1': 3.3485438586491, 'k1': 119.59655224362285, 'c5': 8.320041684111693, 'c6': 9.59390592684502, 'b2': 0.0, 'k2': 16.022521094515888, 'c7': 3.714647768807139, 'c8': 3.971298762659632}
+# 0.24663529940417053 order_accuracy 0.7851428571428571
+avoidances['Cohen_movObst2']['cohen_avoid2']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid2', 'b1': 3.3485438586491, 'k1': 119.59655224362285, 'c5': 8.320041684111693, 'c6': 9.59390592684502, 'b2': 0.0, 'k2': 16.022521094515888, 'c7': 3.714647768807139, 'c8': 3.971298762659632}
 avoidances['Cohen_movObst2']['cohen_avoid2']['differential_evolution'][0] = {}
 avoidances['Cohen_movObst2']['cohen_avoid2']['differential_evolution'][1] = {}
 avoidances['Cohen_movObst2']['cohen_avoid2']['differential_evolution'][2] = {}
@@ -267,7 +273,8 @@ avoidances['Cohen_movObst2']['cohen_avoid2']['differential_evolution'][12] = {}
 avoidances['Cohen_movObst2']['cohen_avoid2']['differential_evolution'][13] = {}
 
 avoidances['Cohen_movObst2']['cohen_avoid3']['differential_evolution'] = {}
-avoidances['Cohen_movObst2']['cohen_avoid3']['differential_evolution'][-1] = {'name': 'cohen_avoid3', 'k1': 27.015824466499474, 'c5': 6.439764681301262, 'c6': 28.71370803318366, 'k2': 23.09740785255075, 'c7': 3.6069831344642873, 'c8': 13.659355893212165}
+# 0.24306915061740852 order_accuracy 0.7908571428571428
+avoidances['Cohen_movObst2']['cohen_avoid3']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid3', 'k1': 27.015824466499474, 'c5': 6.439764681301262, 'c6': 28.71370803318366, 'k2': 23.09740785255075, 'c7': 3.6069831344642873, 'c8': 13.659355893212165}
 avoidances['Cohen_movObst2']['cohen_avoid3']['differential_evolution'][0] = {}
 avoidances['Cohen_movObst2']['cohen_avoid3']['differential_evolution'][1] = {}
 avoidances['Cohen_movObst2']['cohen_avoid3']['differential_evolution'][2] = {}
@@ -282,7 +289,8 @@ avoidances['Cohen_movObst2']['cohen_avoid3']['differential_evolution'][12] = {}
 avoidances['Cohen_movObst2']['cohen_avoid3']['differential_evolution'][13] = {}
 
 avoidances['Cohen_movObst2']['cohen_avoid4']['differential_evolution'] = {}
-avoidances['Cohen_movObst2']['cohen_avoid4']['differential_evolution'][-1] = {'name': 'cohen_avoid4', 'k1': 2.0736814583750123, 'c5': 0.277869777057664, 'c6': 11.55562093696106, 'k2': 0.695174380649082, 'c7': 5.707392197706118, 'c8': 7.709406732831272}
+# 0.24684128447605852 order_accuracy 0.7885714285714286
+avoidances['Cohen_movObst2']['cohen_avoid4']['differential_evolution']['-1obst_onset'] = {'name': 'cohen_avoid4', 'k1': 2.0736814583750123, 'c5': 0.277869777057664, 'c6': 11.55562093696106, 'k2': 0.695174380649082, 'c7': 5.707392197706118, 'c8': 7.709406732831272}
 avoidances['Cohen_movObst2']['cohen_avoid4']['differential_evolution'][0] = {}
 avoidances['Cohen_movObst2']['cohen_avoid4']['differential_evolution'][1] = {}
 avoidances['Cohen_movObst2']['cohen_avoid4']['differential_evolution'][2] = {}
@@ -313,7 +321,8 @@ avoidances['Cohen_movObst2']['perpendicular_avoid']['differential_evolution'][13
 
 
 avoidances['Bai_movObst1']['cohen_avoid']['differential_evolution'] = {}
-avoidances['Bai_movObst1']['cohen_avoid']['differential_evolution'][-1] = {'name': 'cohen_avoid', 'b1': 4.642525322134875, 'k1': 502.8560291766539, 'c5': 14.952434368653059, 'c6': 0.33097327028944756, 'b2': 0.0, 'k2': 15.710653241018438, 'c7': 9.450938176626648, 'c8': 0.25055228278197594}
+avoidances['Bai_movObst1']['cohen_avoid']['differential_evolution']['-1obst_onset'] = {}
+avoidances['Bai_movObst1']['cohen_avoid']['differential_evolution']['-1dpsi_onset'] = {'name': 'cohen_avoid', 'b1': 4.642525322134875, 'k1': 502.8560291766539, 'c5': 14.952434368653059, 'c6': 0.33097327028944756, 'b2': 0.0, 'k2': 15.710653241018438, 'c7': 9.450938176626648, 'c8': 0.25055228278197594}
 avoidances['Bai_movObst1']['cohen_avoid']['differential_evolution'][0] = {'name': 'cohen_avoid', 'b1': 0.09098388731176317, 'k1': 594.214817726885, 'c5': 14.420477841420471, 'c6': 0.4161048020810011, 'b2': 0.019308135992638517, 'k2': 18.060397499673513, 'c7': 9.83465625606361, 'c8': 0.3553896928536771}
 avoidances['Bai_movObst1']['cohen_avoid']['differential_evolution'][1] = {'name': 'cohen_avoid', 'b1': 4.286077744185893, 'k1': 727.8582370725359, 'c5': 17.38054337535812, 'c6': 0.3075579600035621, 'b2': 26.521937704437867, 'k2': 220.47422098786146, 'c7': 9.908950282708284, 'c8': 0.1283507795554835}
 avoidances['Bai_movObst1']['cohen_avoid']['differential_evolution'][2] = {'name': 'cohen_avoid', 'b1': 1.6096275125822497, 'k1': 613.6807662063433, 'c5': 17.308136594011355, 'c6': 0.43420482638338254, 'b2': 0.02340407698077964, 'k2': 12.611600528356654, 'c7': 9.692476812035704, 'c8': 0.11591090603771281}
@@ -328,10 +337,11 @@ avoidances['Bai_movObst1']['cohen_avoid']['differential_evolution'][12] = {'name
 avoidances['Bai_movObst1']['cohen_avoid']['differential_evolution'][13] = {'name': 'cohen_avoid', 'b1': 0.012788967699064005, 'k1': 775.6982856566221, 'c5': 11.57793441676696, 'c6': 0.9176639966606995, 'b2': 0.0036864447798379946, 'k2': 8.171884217269096, 'c7': 8.82661269821173, 'c8': 0.1639927203080436}
 
 avoidances['Bai_movObst1']['cohen_avoid_heading']['differential_evolution'] = {}
-avoidances['Bai_movObst1']['cohen_avoid_heading']['differential_evolution'][-1] = {'name': 'cohen_avoid_heading', 'b1': 9.930552269026572, 'k1': 649.82737708828, 'c5': 17.90090735259422, 'c6': 0.2844581112275794}
+avoidances['Bai_movObst1']['cohen_avoid_heading']['differential_evolution']['-1dpsi_onset'] = {'name': 'cohen_avoid_heading', 'b1': 9.930552269026572, 'k1': 649.82737708828, 'c5': 17.90090735259422, 'c6': 0.2844581112275794}
 
 avoidances['Bai_movObst1']['cohen_avoid2']['differential_evolution'] = {}
-avoidances['Bai_movObst1']['cohen_avoid2']['differential_evolution'][-1] = {'name': 'cohen_avoid2', 'b1': 3.31660936296053, 'k1': 265.24585586337037, 'c5': 9.737473661386517, 'c6': 11.609850708869496, 'b2': 0.0, 'k2': 20.44218194006397, 'c7': 9.879816352314704, 'c8': 14.825253227271302}
+avoidances['Bai_movObst1']['cohen_avoid2']['differential_evolution']['-1obst_onset'] = {}
+avoidances['Bai_movObst1']['cohen_avoid2']['differential_evolution']['-1dpsi_onset'] = {'name': 'cohen_avoid2', 'b1': 3.31660936296053, 'k1': 265.24585586337037, 'c5': 9.737473661386517, 'c6': 11.609850708869496, 'b2': 0.0, 'k2': 20.44218194006397, 'c7': 9.879816352314704, 'c8': 14.825253227271302}
 avoidances['Bai_movObst1']['cohen_avoid2']['differential_evolution'][0] = {'name': 'cohen_avoid2', 'b1': 0.0, 'k1': 175.1266782919033, 'c5': 10.0, 'c6': 18.33415650787958, 'b2': 0.0, 'k2': 91.016945427529, 'c7': 10.0, 'c8': 1.9715456748889322}
 avoidances['Bai_movObst1']['cohen_avoid2']['differential_evolution'][1] = {'name': 'cohen_avoid2', 'b1': 0.23774232340550938, 'k1': 643.8538921265106, 'c5': 9.998435174189762, 'c6': 4.905671679696134, 'b2': 46.72533879566697, 'k2': 544.8894238353804, 'c7': 9.811920038933005, 'c8': 27.91549580051953}
 avoidances['Bai_movObst1']['cohen_avoid2']['differential_evolution'][2] = {'name': 'cohen_avoid2', 'b1': 0.002938733608002621, 'k1': 214.16348025793778, 'c5': 9.961829012195631, 'c6': 7.7035501079480815, 'b2': 0.021319251993631938, 'k2': 14.529557889599491, 'c7': 9.127140739102565, 'c8': 29.91042755394572}
@@ -347,7 +357,8 @@ avoidances['Bai_movObst1']['cohen_avoid2']['differential_evolution'][13] = {'nam
 
 
 avoidances['Bai_movObst1']['cohen_avoid3']['differential_evolution'] = {}
-avoidances['Bai_movObst1']['cohen_avoid3']['differential_evolution'][-1] = {'name': 'cohen_avoid3', 'k1': 93.42068415612331, 'c5': 9.923230152411703, 'c6': 20.077941579021086, 'k2': 22.321805247910984, 'c7': 9.834536869882928, 'c8': 28.10117113055228}
+avoidances['Bai_movObst1']['cohen_avoid3']['differential_evolution']['-1obst_onset'] = {}
+avoidances['Bai_movObst1']['cohen_avoid3']['differential_evolution']['-1dpsi_onset'] = {'name': 'cohen_avoid3', 'k1': 93.42068415612331, 'c5': 9.923230152411703, 'c6': 20.077941579021086, 'k2': 22.321805247910984, 'c7': 9.834536869882928, 'c8': 28.10117113055228}
 avoidances['Bai_movObst1']['cohen_avoid3']['differential_evolution'][0] = {'name': 'cohen_avoid3', 'k1': 100.0, 'c5': 9.170370768359117, 'c6': 30.0, 'k2': 27.761243012133942, 'c7': 9.36611455321723, 'c8': 28.211865589483548}
 avoidances['Bai_movObst1']['cohen_avoid3']['differential_evolution'][1] = {'name': 'cohen_avoid3', 'k1': 98.92106206509318, 'c5': 8.239279826284848, 'c6': 29.947602076667653, 'k2': 44.574384119110796, 'c7': 9.80716407313302, 'c8': 27.465950133315683}
 avoidances['Bai_movObst1']['cohen_avoid3']['differential_evolution'][2] = {'name': 'cohen_avoid3', 'k1': 92.18198345141445, 'c5': 10.0, 'c6': 12.301947764630182, 'k2': 41.30595529614932, 'c7': 9.920427145491614, 'c8': 30.0}
@@ -362,7 +373,8 @@ avoidances['Bai_movObst1']['cohen_avoid3']['differential_evolution'][12] = {'nam
 avoidances['Bai_movObst1']['cohen_avoid3']['differential_evolution'][13] = {'name': 'cohen_avoid3', 'k1': 99.49076483357302, 'c5': 8.340167383259022, 'c6': 7.076312526779212, 'k2': 17.679382605033915, 'c7': 9.270702107449488, 'c8': 28.651245059754366}
 
 avoidances['Bai_movObst1']['cohen_avoid4']['differential_evolution'] = {}
-avoidances['Bai_movObst1']['cohen_avoid4']['differential_evolution'][-1] = {'name': 'cohen_avoid4', 'k1': 35.66006018987271, 'c5': 6.211312647402919, 'c6': 2.8829899279613884, 'k2': 26.297504220855956, 'c7': 9.950133508470925, 'c8': 1.8318341573512125}
+avoidances['Bai_movObst1']['cohen_avoid4']['differential_evolution']['-1obst_onset'] = {}
+avoidances['Bai_movObst1']['cohen_avoid4']['differential_evolution']['-1dpsi_onset'] = {'name': 'cohen_avoid4', 'k1': 35.66006018987271, 'c5': 6.211312647402919, 'c6': 2.8829899279613884, 'k2': 26.297504220855956, 'c7': 9.950133508470925, 'c8': 1.8318341573512125}
 avoidances['Bai_movObst1']['cohen_avoid4']['differential_evolution'][0] = {'name': 'cohen_avoid4', 'k1': 15.334011045146003, 'c5': 6.995452941050658, 'c6': 13.80821757955234, 'k2': 2.051952910314153, 'c7': 6.04780648191303, 'c8': 26.18331334743836}
 avoidances['Bai_movObst1']['cohen_avoid4']['differential_evolution'][1] = {'name': 'cohen_avoid4', 'k1': 35.181704357080534, 'c5': 6.796070699190349, 'c6': 6.499211898407426, 'k2': 3.9437361842692633, 'c7': 7.365866933892889, 'c8': 23.19262641589863}
 avoidances['Bai_movObst1']['cohen_avoid4']['differential_evolution'][2] = {'name': 'cohen_avoid4', 'k1': 37.16078043858363, 'c5': 9.553449144635826, 'c6': 2.813621732590878, 'k2': 3.5671566957723093, 'c7': 7.964565946353126, 'c8': 29.86540115458712}
@@ -380,7 +392,7 @@ avoidances['Bai_movObst1']['cohen_avoid4_heading']['differential_evolution'] = {
 avoidances['Bai_movObst1']['cohen_avoid4_heading']['differential_evolution'][-1] = {'name': 'cohen_avoid4_heading', 'k1': 7.0288327450614645, 'c5': 5.699504822685455, 'c6': 15.368240959940403}
 
 avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'] = {}
-avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'][-1] = {'name': 'perpendicular_avoid', 'k': 11.397868452412597, 'c': 8.813338864706262}
+avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution']['-1dpsi_onset'] = {'name': 'perpendicular_avoid', 'k': 11.397868452412597, 'c': 8.813338864706262}
 avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'][0] = {}
 avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'][1] = {}
 avoidances['Bai_movObst1']['perpendicular_avoid']['differential_evolution'][2] = {}
