@@ -6,7 +6,7 @@ import math
 import numpy as np
 from numpy.linalg import norm
 from numpy import sqrt, sin, cos, arccos, arcsin, arctan, gradient
-from matplotlib import animation, pyplot as plt, gridspec
+from matplotlib import animation, pyplot as plt, gridspec, rcParams
 import matplotlib.cm as cmx
 from matplotlib.colors import Normalize
 from mpl_toolkits.mplot3d import Axes3D
@@ -611,7 +611,8 @@ def collision_trajectory(beta, side, spd1=1.3, w=1.5, r=10, r_min=0, Hz=100, ani
     
     return traj0, traj1, np.tile(v0, (n, 1)), np.tile(v1, (n, 1))
     
-def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, interval=None, save=False):
+def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, linestyles=None,
+               interval=None, save=False, plot=False, t_end=None, fontsize=None):
     '''
     Args:
         trajs (list of traj): Trajectories to be played. shape: n_frame by n_dimension.
@@ -620,91 +621,104 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, i
         ref (2d vector): The reference vector that defines heading phi.
         labels (list of str): Label of each agent.
         colors (list of str): Color of each agent, such as ['r', 'g', 'b'].
+        linestyles (list of str): Type of lines such as ['-', '--', ':'].
         interval (float): The pause between two frames in millisecond.
         save (bool): Flag for saving the animation in the current working directory.
+        plot (bool): Wether output static plot instead of animation.
+        t_end (int): End time (frame) of the simulation.
     '''
+    rcParams.update({'font.size': fontsize})
     trajs = np.array(trajs)
+    ids = list(range(len(trajs)))
     if not interval: interval = 1000 / Hz
     if not colors: colors = [None] * len(trajs)
     # Create a figure
-    fig = plt.figure(figsize=(15, 7))
-    spec = gridspec.GridSpec(ncols=3, nrows=1,
-                         width_ratios=[1, 1, 2])
+    fig, axs = plt.subplots(1, 3, figsize=(15, 7), constrained_layout=True)
+    # spec = gridspec.GridSpec(ncols=3, nrows=1,
+                         # width_ratios=[1, 1, 1])
     if title:
         fig.suptitle(title)
     # Create speed plot
-    ax0 = fig.add_subplot(spec[0])
-    ax0.set_ylim(0, 2.0)
-    ax0.set_xlabel('time (s)')
-    ax0.set_ylabel('speed (m/s)')
-    ax0.set_title('Speed')
-    for id, traj in enumerate(trajs):
+    # axs[0] = fig.add_subplot(spec[0])
+    axs[0].set_ylim(0, 2.0)
+    axs[0].set_xlabel('Time (s)')
+    axs[0].set_ylabel('Speed (m/s)')
+    axs[0].set_title('Speed')
+    for id, traj, color, linestyle in zip(ids, trajs, colors, linestyles):
         if labels:
             id = labels[id]
         s = traj_speed(traj, Hz)
         t = np.linspace(0, len(traj)-1, len(traj)) / Hz
-        ax0.plot(t, s, label=str(id))
-    ax0.legend()
-    time_bar0, = ax0.plot([t[0], t[0]], ax0.get_ylim(), color=(0.7, 0.7, 0.7))
+        axs[0].plot(t, s, label=str(id), color=color, linestyle=linestyle)
+    axs[0].legend()
+    if not plot:
+        time_bar0, = axs[0].plot([t[0], t[0]], axs[0].get_ylim(), color=(0.7, 0.7, 0.7))
     # Create heading plot
-    ax1 = fig.add_subplot(spec[1])
-    ax1.set_ylim(-3.2, 3.2)
-    ax1.set_xlabel('time (s)')
-    ax1.set_ylabel('heading (radian)')
-    ax1.set_title('Heading')
-    for id, traj in enumerate(trajs):
+    # axs[1] = fig.add_subplot(spec[1])
+    axs[1].set_ylim(-3.2, 3.2)
+    axs[1].set_xlabel('Time (s)')
+    axs[1].set_ylabel('Heading (rad)')
+    axs[1].set_title('Heading')
+    for id, traj, color, linestyle in zip(ids, trajs, colors, linestyles):
         if labels:
             id = labels[id]
         phi = v2sp(np.gradient(traj, axis=0) * Hz, ref=ref)[1]
-        ax1.plot(t, phi, label=str(id))
-    ax1.legend()
-    time_bar1, = ax1.plot([t[0], t[0]], ax1.get_ylim(), color=(0.7, 0.7, 0.7))
+        axs[1].plot(t, phi, label=str(id), color=color, linestyle=linestyle)
+    if not plot:
+        time_bar1, = axs[1].plot([t[0], t[0]], axs[1].get_ylim(), color=(0.7, 0.7, 0.7))
     # Create path plot
-    ax2 = fig.add_subplot(spec[2])
-    ax2.set_xlim(-12, 12)
-    ax2.set_ylim(-12, 12)
-    ax2.set_xlabel('postion x (m)')
-    ax2.set_ylabel('postion y (m)')
-    ax2.set_title('Path')
-    ax2.set_aspect('equal')    
+    # axs[2] = fig.add_subplot(spec[2])
+    axs[2].set_xlim(-3, 3)
+    axs[2].set_ylim(-1, 9)
+    axs[2].set_xlabel('Postion x (m)')
+    axs[2].set_ylabel('Postion y (m)')
+    axs[2].set_title('Path')
+    axs[2].set_aspect('equal')
     angles = np.linspace(0, 2 * math.pi, num=12)
     circles = []
     agents = []
-    ids = list(range(len(trajs)))
-    for id, traj, w, color in zip(ids, trajs, ws, colors):
+    
+    for id, traj, w, color, linestyle in zip(ids, trajs, ws, colors, linestyles):
         w = 0 if not w else w
         if labels:
             id = labels[id]
         circle = np.stack((w / 2 * cos(angles), w / 2 * sin(angles)), axis=-1)
-        agent, = ax2.plot(traj[0, 0] + circle[:, 0], traj[0, 1] + circle[:, 1], color=color)
-        ax2.plot([p[0] for p in traj], [p[1] for p in traj], color=agent.get_color(), label=str(id)) # Plot trajectory
+        if plot:
+            agent, = axs[2].plot(traj[t_end-1, 0] + circle[:, 0], traj[t_end-1, 1] + circle[:, 1], color=color)
+        else:
+            agent, = axs[2].plot(traj[0, 0] + circle[:, 0], traj[0, 1] + circle[:, 1], color=color)
+        axs[2].plot([p[0] for p in traj], [p[1] for p in traj], color=agent.get_color(), label=str(id),
+                 linestyle=linestyle) # Plot trajectory
         agents.append(agent)
         circles.append(circle)
-
-    def animate(i):
-        # ms is the short for markersize
-        for agent, traj, circle in zip(agents, trajs, circles):
-            agent.set_data(traj[i, 0] + circle[:, 0], traj[i, 1] + circle[:, 1])
-        time_bar0.set_data([t[i], t[i]], ax0.get_ylim())
-        time_bar1.set_data([t[i], t[i]], ax1.get_ylim())
-        lines = agents[:]
-        lines.append(time_bar0)
-        lines.append(time_bar1)
-        return lines
-
-    # call the animator.  blit=True means only re-draw the parts that have changed.
-    anim = animation.FuncAnimation(fig, animate, frames=len(trajs[0]), interval=interval, blit=True)
-    # save the animation as an mp4.  This requires ffmpeg or mencoder to be
-        # installed.  The extra_args ensure that the x264 codec is used, so that
-        # the video can be embedded in html5.  You may need to adjust this for
-        # your system: for more information, see
-        # http://matplotlib.sourceforge.net/api/animation_api.html
-    if save:
-        t_stamp = ymdhms()
-        filename = 'play_trial' + t_stamp + '.mp4'
-        anim.save(filename)
-    return anim
     
+    if plot:
+        plt.show()
+    else:
+        def animate(i):
+            # ms is the short for markersize
+            for agent, traj, circle in zip(agents, trajs, circles):
+                agent.set_data(traj[i, 0] + circle[:, 0], traj[i, 1] + circle[:, 1])
+            time_bar0.set_data([t[i], t[i]], axs[0].get_ylim())
+            time_bar1.set_data([t[i], t[i]], axs[1].get_ylim())
+            lines = agents[:]
+            lines.append(time_bar0)
+            lines.append(time_bar1)
+            return lines
+
+        # call the animator.  blit=True means only re-draw the parts that have changed.
+        anim = animation.FuncAnimation(fig, animate, frames=len(trajs[0]), interval=interval, blit=True)
+        # save the animation as an mp4.  This requires ffmpeg or mencoder to be
+            # installed.  The extra_args ensure that the x264 codec is used, so that
+            # the video can be embedded in html5.  You may need to adjust this for
+            # your system: for more information, see
+            # http://matplotlib.sourceforge.net/api/animation_api.html
+        if save:
+            t_stamp = ymdhms()
+            filename = 'play_trial' + t_stamp + '.mp4'
+            anim.save(filename)
+        return anim
+
 def scatter3d(x, y, z, cs=None, colorsMap='gist_rainbow', fig=None, ax=None):
     '''
     Plots scatter plot in 3d. Has the option of color coding the z value.

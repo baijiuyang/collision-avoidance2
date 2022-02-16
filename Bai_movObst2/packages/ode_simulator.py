@@ -304,11 +304,19 @@ class ODESimulator:
         toc = time.perf_counter()
         print(f'Simulated {n_trials} trials in {hms(toc - tic):s}')
 
-    def play(self, i_trial=0, title=None, colors=None, interval=None, save=False, obst=True):
+    def play(self, i_trial=0, title=None, colors=None, linestyles=None, interval=None, save=False,
+            obst=True, plot=False, fontsize=None):
         '''
         Args:
             interval (float): The pause between two frames in millisecond.
             save (bool): Flag for saving the animation in the current working directory.
+            labels (list of str): Label of each agent.
+            colors (list of str): Color of each agent, such as ['r', 'g', 'b'].
+            linestyles (list of str): Type of lines such as ['-', '--', ':'].
+            interval (float): The pause between two frames in millisecond.
+            save (bool): Flag for saving the animation in the current working directory.
+            obst (bool): Wether there is obstacle in animation.
+            plot (bool): Wether output static plot instead of animation.
         '''
         # Trial index in data instead of simulation results (because some trials are skipped in simulation)
         labels = ['model', 'goal']
@@ -322,6 +330,7 @@ class ODESimulator:
             p_subj = self.data.info['p_subj'][j_trial]            
             # Pad values to p_pred to give it the same length as p_subj
             t0 = self.t0[j_trial]
+            t1 = self.data.info['obst_out'][j_trial] 
             p_pred = np.zeros_like(p_subj)
             p_pred[t0: t0+len(self.p_pred[i_trial])] = self.p_pred[i_trial]            
             # p_pred[:t0], p_pred[t0+len(self.p_pred[i_trial]):] = p_pred[t0], p_pred[t0+len(self.p_pred[i_trial])-1]
@@ -341,7 +350,8 @@ class ODESimulator:
                 ws.append(self.args['w_obst'])
                 labels.append('obst')
 
-        return play_trajs(trajs, ws, self.Hz, ref=self.ref, title=title, labels=labels, colors=colors, interval=interval, save=save)
+        return play_trajs(trajs, ws, self.Hz, ref=self.ref, title=title, labels=labels, colors=colors,
+                          linestyles=linestyles, interval=interval, save=save, plot=plot, t_end=t1, fontsize=fontsize)
 
     def test(self, metric, i_trials=None, all_errors=False):
         '''
