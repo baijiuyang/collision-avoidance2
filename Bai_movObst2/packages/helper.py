@@ -612,7 +612,8 @@ def collision_trajectory(beta, side, spd1=1.3, w=1.5, r=10, r_min=0, Hz=100, ani
     return traj0, traj1, np.tile(v0, (n, 1)), np.tile(v1, (n, 1))
     
 def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, linestyles=None,
-               interval=None, save=False, plot=False, t_end=None, fontsize=None):
+               interval=None, save=False, plot=False, t_end=None, fontsize=13, xrange=None,
+               yrange=None):
     '''
     Args:
         trajs (list of traj): Trajectories to be played. shape: n_frame by n_dimension.
@@ -632,6 +633,7 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, l
     ids = list(range(len(trajs)))
     if not interval: interval = 1000 / Hz
     if not colors: colors = [None] * len(trajs)
+    if not linestyles: linestyles = ['-'] * len(trajs)
     # Create a figure
     fig, axs = plt.subplots(1, 3, figsize=(15, 7), constrained_layout=True)
     # spec = gridspec.GridSpec(ncols=3, nrows=1,
@@ -668,11 +670,17 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, l
         time_bar1, = axs[1].plot([t[0], t[0]], axs[1].get_ylim(), color=(0.7, 0.7, 0.7))
     # Create path plot
     # axs[2] = fig.add_subplot(spec[2])
-    axs[2].set_xlim(-3, 3)
-    axs[2].set_ylim(-1, 9)
+    if xrange:
+        axs[2].set_xlim(xrange[0], xrange[1])
+    else:
+        axs[2].set_xlim(-10, 10)
+    if yrange:
+        axs[2].set_ylim(yrange[0], yrange[1])
+    else:
+        axs[2].set_ylim(-10, 10)
     axs[2].set_xlabel('Postion x (m)')
     axs[2].set_ylabel('Postion y (m)')
-    axs[2].set_title('Path')
+    axs[2].set_title('Trajectory')
     axs[2].set_aspect('equal')
     angles = np.linspace(0, 2 * math.pi, num=12)
     circles = []
