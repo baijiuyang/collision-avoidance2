@@ -266,9 +266,9 @@ class ODESimulator:
 
         for i in trials:
             # Skip freewalk trial and +-180 trials
-            if 'obst_speed' in self.data.info and \
-                'obst_angle' in self.data.info and \
-                (self.data.info['obst_speed'][i] == 0 or abs(self.data.info['obst_angle'][i]) == 180):
+            if 'obst_speed' in self.data.info and self.data.info['obst_speed'][i] == 0 or \
+               'obst_angle' in self.data.info and (self.data.info['obst_angle'][i] == None or abs(self.data.info['obst_angle'][i]) == 180) or \
+               'obst_dist' in self.data.info and self.data.info['obst_dist'][i] == None:
                 continue
             if ps == 'subj':
                 for model in self.models:                        
