@@ -613,7 +613,7 @@ def collision_trajectory(beta, side, spd1=1.3, w=1.5, r=10, r_min=0, Hz=100, ani
     
 def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, linestyles=None,
                interval=None, save=False, plot=False, t_end=None, fontsize=13, xrange=None,
-               yrange=None):
+               yrange=None, fig_size=None):
     '''
     Args:
         trajs (list of traj): Trajectories to be played. shape: n_frame by n_dimension.
@@ -640,6 +640,8 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, l
                          # width_ratios=[1, 1, 1])
     if title:
         fig.suptitle(title)
+    if fig_size:
+        fig.set_size_inches(fig_size[0], fig_size[1])
     # Create speed plot
     # axs[0] = fig.add_subplot(spec[0])
     axs[0].set_ylim(0, 2.0)
@@ -712,6 +714,104 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, l
             lines = agents[:]
             lines.append(time_bar0)
             lines.append(time_bar1)
+            return lines
+
+        # call the animator.  blit=True means only re-draw the parts that have changed.
+        anim = animation.FuncAnimation(fig, animate, frames=len(trajs[0]), interval=interval, blit=True)
+        # save the animation as an mp4.  This requires ffmpeg or mencoder to be
+            # installed.  The extra_args ensure that the x264 codec is used, so that
+            # the video can be embedded in html5.  You may need to adjust this for
+            # your system: for more information, see
+            # http://matplotlib.sourceforge.net/api/animation_api.html
+        if save:
+            t_stamp = ymdhms()
+            filename = 'play_trial' + t_stamp + '.mp4'
+            anim.save(filename)
+        return anim
+
+def play_trajs_variable(trajs, variable, v_ylabel, v_range, v_title, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, linestyles=None,
+                   interval=None, save=False, plot=False, t_end=None, fontsize=13, xrange=None,
+                   yrange=None):
+    '''
+    Args:
+        trajs (list of traj): Trajectories to be played. shape: n_frame by n_dimension.
+        ws (list of floats): The width of agents.
+        Hz (int): The frequency of data.
+        ref (2d vector): The reference vector that defines heading phi.
+        labels (list of str): Label of each agent.
+        colors (list of str): Color of each agent, such as ['r', 'g', 'b'].
+        linestyles (list of str): Type of lines such as ['-', '--', ':'].
+        interval (float): The pause between two frames in millisecond.
+        save (bool): Flag for saving the animation in the current working directory.
+        plot (bool): Wether output static plot instead of animation.
+        t_end (int): End time (frame) of the simulation.
+    '''
+    rcParams.update({'font.size': fontsize})
+    trajs = np.array(trajs)
+    ids = list(range(len(trajs)))
+    if not interval: interval = 1000 / Hz
+    if not colors: colors = [None] * len(trajs)
+    if not linestyles: linestyles = ['-'] * len(trajs)
+    # Create a figure
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5), constrained_layout=True)
+    if title:
+        fig.suptitle(title)
+    if fig_size:
+        fig.set_size_inches(fig_size[0], fig_size[1])
+    # Create variable plot
+    axs[0].set_ylim(v_range[0], v_range[1])
+    axs[0].set_xlabel('Time (s)')
+    axs[0].set_ylabel(v_ylabel)
+    axs[0].set_title(v_title)
+    t = np.linspace(0, len(variable)-1, len(variable)) / Hz
+    axs[0].plot(t, variable)
+
+    if not plot:
+        time_bar0, = axs[0].plot([t[0], t[0]], axs[0].get_ylim(), color=(0.7, 0.7, 0.7))
+    
+    # Create path plot
+    if xrange:
+        axs[1].set_xlim(xrange[0], xrange[1])
+    else:
+        axs[1].set_xlim(-5, 5)
+    if yrange:
+        axs[1].set_ylim(yrange[0], yrange[1])
+    else:
+        axs[1].set_ylim(-5, 5)
+    axs[1].set_xlabel('Postion x (m)')
+    axs[1].set_ylabel('Postion y (m)')
+    axs[1].set_title('Trajectory')
+    axs[1].set_aspect('equal')
+    angles = np.linspace(0, 2 * math.pi, num=12)
+    circles = []
+    agents = []
+    
+    for id, traj, w, color, linestyle in zip(ids, trajs, ws, colors, linestyles):
+        w = 0 if not w else w
+        if labels:
+            id = labels[id]
+        circle = np.stack((w / 2 * cos(angles), w / 2 * sin(angles)), axis=-1)
+        if plot:
+            agent, = axs[1].plot(traj[t_end-1, 0] + circle[:, 0], traj[t_end-1, 1] + circle[:, 1], color=color)
+        else:
+            agent, = axs[1].plot(traj[0, 0] + circle[:, 0], traj[0, 1] + circle[:, 1], color=color)
+        axs[1].plot([p[0] for p in traj], [p[1] for p in traj], color=agent.get_color(), label=str(id),
+                 linestyle=linestyle) # Plot trajectory
+        agents.append(agent)
+        circles.append(circle)
+
+    axs[1].legend()
+    
+    if plot:
+        plt.show()
+    else:
+        def animate(i):
+            # ms is the short for markersize
+            for agent, traj, circle in zip(agents, trajs, circles):
+                agent.set_data(traj[i, 0] + circle[:, 0], traj[i, 1] + circle[:, 1])
+            time_bar0.set_data([t[i], t[i]], axs[0].get_ylim())
+            lines = agents[:]
+            lines.append(time_bar0)
             return lines
 
         # call the animator.  blit=True means only re-draw the parts that have changed.

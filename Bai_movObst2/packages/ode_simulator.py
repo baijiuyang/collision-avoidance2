@@ -305,7 +305,7 @@ class ODESimulator:
         print(f'Simulated {n_trials} trials in {hms(toc - tic):s}')
 
     def play(self, i_trial=0, title=None, colors=None, linestyles=None, interval=None, save=False,
-            obst=True, plot=False, fontsize=13, xrange=None, yrange=None):
+            obst=True, plot=False, fontsize=13, xrange=None, yrange=None, fig_size=None):
         '''
         Args:
             interval (float): The pause between two frames in millisecond.
@@ -352,7 +352,7 @@ class ODESimulator:
 
         return play_trajs(trajs, ws, self.Hz, ref=self.ref, title=title, labels=labels, colors=colors,
                           linestyles=linestyles, interval=interval, save=save, plot=plot, t_end=t1,
-                          fontsize=fontsize, xrange=xrange, yrange=yrange)
+                          fontsize=fontsize, xrange=xrange, yrange=yrange, fig_size=fig_size)
 
     def test(self, metric, i_trials=None, all_errors=False):
         '''
