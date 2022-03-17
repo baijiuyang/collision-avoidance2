@@ -76,6 +76,8 @@ def run_trial(i_trial, angle, speed, dsize, ipd, recorded):
                 goToStage('go')
         else:
             timer_on = False
+        if REPLAY:
+            goToStage('go')
     elif stage == 'go':
         # Turn off home and orient poles, turn on goal pole
         if models['homePole'].getVisible():
@@ -95,6 +97,13 @@ def run_trial(i_trial, angle, speed, dsize, ipd, recorded):
             # Check subject lateral deviation
             if offCourse(cur_pos):
                 sounds['startover'].play()                
+                reset_trial()
+        if REPLAY:
+            i = int(trial_time * HZ)
+            try:
+                viz.MainView.setPosition(DATA[i][0], DATA[i][1], DATA[i][2])
+                viz.MainView.setEuler(DATA[i][3], DATA[i][4], DATA[i][5])
+            except:
                 reset_trial()
     # Obstacle appears    
     elif stage == 'avoid':
@@ -121,8 +130,15 @@ def run_trial(i_trial, angle, speed, dsize, ipd, recorded):
                 models['orientPole'].visible(viz.OFF)
                 models['goalPole'].visible(viz.OFF)
                 sounds['end'].play()
-            else:
+            elif not REPLAY:
                 ii += 1
+        if REPLAY:
+            i = int(trial_time * HZ)
+            try:
+                viz.MainView.setPosition(DATA[i][0], DATA[i][1], DATA[i][2])
+                viz.MainView.setEuler(DATA[i][3], DATA[i][4], DATA[i][5])
+            except:
+                reset_trial()
                 
 def reset_trial():
     global stage, print_flag, alpha, timer_on, trial_time, timer_stamp, data_buffer, \
@@ -299,9 +315,9 @@ if __name__ == "__main__":
     DATA_COLLECT = True
     # If program should run practice trials
     DO_PRACTICE = True
-
     # If program crashes, start trials here
-    START_ON_TRIAL = None
+    START_ON_TRIAL = 31
+    
     if not START_ON_TRIAL:
         START_ON_TRIAL = -3 if DO_PRACTICE else 1
     TOTAL_TRIALS = 154 # 4 (angle) * 2 (speed) * 3 (expansion) * 2 (disparity) * 3 (reps) + 10 (freewalk) 
@@ -378,9 +394,7 @@ if __name__ == "__main__":
     sounds['stop'] = viz.addAudio(os.path.abspath(os.path.join(SOUND_DIR, 'Stop.wav')))
     # set up IO
     # Dialog box asking for type of control and subject number
-    HMD = 'Odyssey'
-    MONITOR = 'PC Monitor'
-    controlOptions = [HMD, MONITOR]
+    controlOptions = ['Odyssey', 'Keyboard', 'Replay']
     controlType = controlOptions[viz.choose('How would you like to explore? ', controlOptions)]
 
     subject = viz.input('Please enter the subject number:','')
@@ -392,14 +406,14 @@ if __name__ == "__main__":
     # a - Turn L		s - Back		d - Turn R
     # y - Face Up		r - Fly Up
     # h - Face Down		f - Fly Down
-    if controlType == MONITOR:
+    if controlType == 'Keyboard':
         HZ = 60
         headTrack = viztracker.Keyboard6DOF()
         link = viz.link(headTrack, viz.MainView)
         headTrack.eyeheight(1.6)
         link.setEnabled(True)
-        viz.go()
-    elif controlType == HMD:
+        REPLAY = False
+    elif controlType == 'Odyssey':
         HZ = 90
         vizconnect.go('vizconnect_config.py')
         # Overwrite headset ipd
@@ -407,10 +421,17 @@ if __name__ == "__main__":
         vizact.onupdate(viz.UPDATE_LINKS + 1, overwriteIPD)	
         # add Odyssey tracker
         ODTracker = vizconnect.getTracker('head_tracker')
-    
+        REPLAY = False
+    elif controlType == 'Replay':
+        HZ = 90
+        # Replay trial using data
+        REPLAY = True
+        with open('replay_data.csv', 'r') as f:
+            lines = f.read().split('\n')[2:-1]
+            DATA = [[float(x) for x in line.split(',')[1:7]] for line in lines]
     # Use a large size of the viewing frustum
     viz.clip(.001,1000)
-    
+    viz.go()
     # loads experimental conditions
     inputFile = os.path.abspath(os.path.join(INPUT_DIR, 'exp_a_subj' + subject + '.csv'))
     
@@ -423,7 +444,7 @@ if __name__ == "__main__":
     
     # Initailize trial variables
     reset_trial()
-    
+    print('here')
     # Restarts the loop, at a rate of Hz
     viz.callback(viz.TIMER_EVENT,masterLoop)
     viz.starttimer(0,1.0/HZ,viz.FOREVER)

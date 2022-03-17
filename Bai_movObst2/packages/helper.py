@@ -731,7 +731,7 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, l
 
 def play_trajs_variable(trajs, variable, v_ylabel, v_range, v_title, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, linestyles=None,
                    interval=None, save=False, plot=False, t_end=None, fontsize=13, xrange=None,
-                   yrange=None):
+                   yrange=None, fig_size=None):
     '''
     Args:
         trajs (list of traj): Trajectories to be played. shape: n_frame by n_dimension.
