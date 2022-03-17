@@ -65,6 +65,8 @@ def run_trial(i_trial, angle, speed, recorded):
                 goToStage('go')
         else:
             timer_on = False
+        if REPLAY:
+            goToStage('go')
     elif stage == 'go':
         # Turn off home and orient poles, turn on goal pole
         if models['homePole'].getVisible():
@@ -74,14 +76,21 @@ def run_trial(i_trial, angle, speed, recorded):
             models['goalPole'].visible(viz.ON)
             sounds['begin'].play()
             trial_time = 0
-            recording = True       
+            recording = True
         # Is stage ended?
         if overTheLine(cur_pos, RAMP_DIST, i_trial):
             goToStage('avoid')
         else:
             # Check subject lateral deviation
             if offCourse(cur_pos):
-                sounds['startover'].play()                
+                sounds['startover'].play()
+                reset_trial()
+        if REPLAY:
+            i = int(trial_time * HZ)
+            try:
+                viz.MainView.setPosition(DATA[i][0], DATA[i][1], DATA[i][2])
+                viz.MainView.setEuler(DATA[i][3], DATA[i][4], DATA[i][5])
+            except:
                 reset_trial()
     # Obstacle appears    
     elif stage == 'avoid':
@@ -101,9 +110,15 @@ def run_trial(i_trial, angle, speed, recorded):
             if i_trial == TOTAL_TRIALS:
                 stage == 'NULL'
                 sounds['end'].play()
-            else:
+            elif not REPLAY:
                 ii += 1
-                
+        if REPLAY:
+            i = int(trial_time * HZ)
+            try:
+                viz.MainView.setPosition(DATA[i][0], DATA[i][1], DATA[i][2])
+                viz.MainView.setEuler(DATA[i][3], DATA[i][4], DATA[i][5])
+            except:
+                reset_trial()
 def reset_trial():
     global stage, print_flag, alpha, timer_on, trial_time, timer_stamp, data_buffer, \
     recording
@@ -255,9 +270,9 @@ if __name__ == "__main__":
     DATA_COLLECT = True
     # If program should run practice trials
     DO_PRACTICE = True
-
+    
     # If program crashes, start trials here
-    START_ON_TRIAL = 0
+    START_ON_TRIAL = 14
     TOTAL_TRIALS = 160 # 5 (angle) * 5 (speed) * 6 (reps) + 10 (freewalk) 
 
     # Set output directory for writing data
@@ -270,7 +285,7 @@ if __name__ == "__main__":
     # Orientation constants
     POLE_TRIGGER_RADIUS = 0.3 # How close participant must be to home pole
     THRESHOLD_THETA = 10 # Maximum angle participant can deviate when looking at orienting pole
-    ORIENT_TIME = 3 # How long participant must orient onto pole
+    ORIENT_TIME = 2 # How long participant must orient onto pole
     COURSE_MARGIN = 0.2 # off-course threshold
     # The dimension of the room space used for experiment
     DIMENSION_X, DIMENSION_Z = 9.0, 11.0
@@ -332,9 +347,7 @@ if __name__ == "__main__":
     sounds['stop'] = viz.addAudio(os.path.abspath(os.path.join(SOUND_DIR, 'Stop.wav')))
     # set up IO
     # Dialog box asking for type of control and subject number
-    HMD = 'Odyssey'
-    MONITOR = 'PC Monitor'
-    controlOptions = [HMD, MONITOR]
+    controlOptions = ['Odyssey', 'Keyboard', 'Replay']
     controlType = controlOptions[viz.choose('How would you like to explore? ', controlOptions)]
 
     subject = viz.input('Please enter the subject number:','')
@@ -346,19 +359,29 @@ if __name__ == "__main__":
     # a - Turn L		s - Back		d - Turn R
     # y - Face Up		r - Fly Up
     # h - Face Down		f - Fly Down
-    if controlType == MONITOR:
+    if controlType == 'Keyboard':
         HZ = 60
         headTrack = viztracker.Keyboard6DOF()
         link = viz.link(headTrack, viz.MainView)
         headTrack.eyeheight(1.6)
         link.setEnabled(True)
-    elif controlType == HMD:
+        REPLAY = False
+    elif controlType == 'Odyssey':
         HZ = 90
         # viz.fullscreen.x is the inital x position when run	
         # add Odyssey tracker
         ODTracker = steamvr.HMD().getSensor()
         # add the virtual tracker, link it to the MainView and set an offset to get the eye position
         link = viz.link(ODTracker, viz.MainView)
+        REPLAY = False
+    elif controlType == 'Replay':
+        HZ = 90
+        # Replay trial using data
+        REPLAY = True
+        if REPLAY:
+            with open('replay_data.csv', 'r') as f:
+                lines = f.read().split('\n')[2:-1]
+                DATA = [[float(x) for x in line.split(',')[1:7]] for line in lines]
     viz.clip(.001,1000) # Adjust size of the viewing frustum
     viz.go()
     
