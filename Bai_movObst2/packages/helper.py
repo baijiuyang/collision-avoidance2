@@ -654,20 +654,21 @@ def play_trajs(trajs, ws, Hz, ref=[0,1], title=None, labels=None, colors=None, l
         s = traj_speed(traj, Hz)
         t = np.linspace(0, len(traj)-1, len(traj)) / Hz
         axs[0].plot(t, s, label=str(id), color=color, linestyle=linestyle)
-    axs[0].legend()
+    # axs[0].legend(loc='lower right', prop={'size': 10})
     if not plot:
         time_bar0, = axs[0].plot([t[0], t[0]], axs[0].get_ylim(), color=(0.7, 0.7, 0.7))
     # Create heading plot
     # axs[1] = fig.add_subplot(spec[1])
-    axs[1].set_ylim(-3.2, 3.2)
+    axs[1].set_ylim(-190, 190)
     axs[1].set_xlabel('Time (s)')
-    axs[1].set_ylabel('Heading (rad)')
+    axs[1].set_ylabel('Heading (°)')
     axs[1].set_title('Heading')
     for id, traj, color, linestyle in zip(ids, trajs, colors, linestyles):
         if labels:
             id = labels[id]
-        phi = v2sp(np.gradient(traj, axis=0) * Hz, ref=ref)[1]
+        phi = v2sp(np.gradient(traj, axis=0) * Hz, ref=ref)[1] * 180 / np.pi
         axs[1].plot(t, phi, label=str(id), color=color, linestyle=linestyle)
+    axs[1].legend(loc='upper right', prop={'size': 10})
     if not plot:
         time_bar1, = axs[1].plot([t[0], t[0]], axs[1].get_ylim(), color=(0.7, 0.7, 0.7))
     # Create path plot
