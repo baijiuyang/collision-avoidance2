@@ -346,7 +346,7 @@ class ODESimulator:
             trajs = [self.p_pred[i_trial], self.p_goal[i_trial]]
             ws = [0.4, self.args['w_goal']]
             if obst:
-                trials.append(self.p_obst[i_trial])
+                trajs.append(self.p_obst[i_trial])
                 ws.append(self.args['w_obst'])
                 labels.append('obst')
 
