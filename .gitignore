@@ -114,6 +114,7 @@ cython_debug/
 
 # Project data files
 *.txt
+!requirements.txt
 *.mp4
 *.png
 *.jpg
